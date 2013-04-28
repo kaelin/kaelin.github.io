@@ -136,25 +136,39 @@ metadata describing the array.</p>
 <p>The <code>vMAT_Array</code> class serves exactly this purpose. This code snippet shows one way<sup id="fnref:pedagogy"><a href="#fn:pedagogy" rel="footnote">2</a></sup> an instance may be created
 and initialized:</p>
 
-<pre><code>const float iniM[] = {
-     2, 11,  7, 14,
-     3, 10,  6, 15,
-    13,  8, 12,  1,
-};
-vMAT_Array * matM = [vMAT_Array arrayWithSize:vMAT_MakeSize(4, 3)
-                                         type:miSINGLE
-                                         data:[NSData dataWithBytes:iniM length:sizeof(iniM)]];
-NSLog(@"%@", matM.dump);
-</code></pre>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class="objc"><span class="line"><span class="k">const</span> <span class="kt">float</span> <span class="n">iniM</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class="line">     <span class="mi">2</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span>  <span class="mi">7</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span>
+</span><span class="line">     <span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span>  <span class="mi">6</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span>
+</span><span class="line">    <span class="mi">13</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>
+</span><span class="line"><span class="p">};</span>
+</span><span class="line"><span class="n">vMAT_Array</span> <span class="o">*</span> <span class="n">matM</span> <span class="o">=</span> <span class="p">[</span><span class="n">vMAT_Array</span> <span class="nl">arrayWithSize:</span><span class="n">vMAT_MakeSize</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</span><span class="line">                                         <span class="nl">type:</span><span class="n">miSINGLE</span>
+</span><span class="line">                                         <span class="nl">data:</span><span class="p">[</span><span class="n">NSData</span> <span class="nl">dataWithBytes:</span><span class="n">iniM</span> <span class="nl">length:</span><span class="k">sizeof</span><span class="p">(</span><span class="n">iniM</span><span class="p">)]];</span>
+</span><span class="line"><span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;%@&quot;</span><span class="p">,</span> <span class="n">matM</span><span class="p">.</span><span class="n">dump</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>And here is what gets output to the console when the above snippet is executed:</p>
 
-<pre><code>2013-04-13 09:28:52.901 otest[93332:303] &lt;vMAT_SingleArray: 0x10053f380; size: [4 3]&gt; = 
- 2  3 13
-11 10  8
- 7  6 12
-14 15  1
-</code></pre>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="console"><span class="line"><span class="go">2013-04-13 09:28:52.901 otest[93332:303] &lt;vMAT_SingleArray: 0x10053f380; size: [4 3]&gt; = </span>
+</span><span class="line"><span class="go"> 2  3 13</span>
+</span><span class="line"><span class="go">11 10  8</span>
+</span><span class="line"><span class="go"> 7  6 12</span>
+</span><span class="line"><span class="go">14 15  1</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>There are a couple of important things to note here: First, the console output appears transposed from
 the <code>float M[]</code> initializer used above. That’s because <strong>vMAT</strong> arrays are stored in <em>column-major</em> order,
@@ -174,41 +188,64 @@ and <strong>Eigen</strong> objects.</p>
 <p>This is the role of the <code>vMAT::Mat</code> template class. This snippet uses an overload of <code>operator *</code>
 provided by <strong>Eigen</strong> to compute the element-wise square of <code>matM</code> as defined above:</p>
 
-<pre><code>namespace {    
-    using namespace Eigen;
-    using namespace vMAT;
-}
-⋮
-Mat&lt;float&gt; M = matM;
-Matrix&lt;float, 4, 3&gt; X = M.array() * M.array();
-vMAT_Array * matX = vMAT_cast(X);
-NSLog(@"%@", matX.dump);
-</code></pre>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class="objc"><span class="line"><span class="n">namespace</span> <span class="p">{</span>
+</span><span class="line">    <span class="n">using</span> <span class="n">namespace</span> <span class="n">Eigen</span><span class="p">;</span>
+</span><span class="line">    <span class="n">using</span> <span class="n">namespace</span> <span class="n">vMAT</span><span class="p">;</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line"><span class="err">⋮</span>
+</span><span class="line"><span class="n">Mat</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span> <span class="n">M</span> <span class="o">=</span> <span class="n">matM</span><span class="p">;</span>
+</span><span class="line"><span class="n">Matrix</span><span class="o">&lt;</span><span class="kt">float</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="o">&gt;</span> <span class="n">X</span> <span class="o">=</span> <span class="n">M</span><span class="p">.</span><span class="n">array</span><span class="p">()</span> <span class="o">*</span> <span class="n">M</span><span class="p">.</span><span class="n">array</span><span class="p">();</span>
+</span><span class="line"><span class="n">vMAT_Array</span> <span class="o">*</span> <span class="n">matX</span> <span class="o">=</span> <span class="n">vMAT_cast</span><span class="p">(</span><span class="n">X</span><span class="p">);</span>
+</span><span class="line"><span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;%@&quot;</span><span class="p">,</span> <span class="n">matX</span><span class="p">.</span><span class="n">dump</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Here the <code>X</code> variable used to receive the matrix multiplication result is a “plain” <code>Eigen::Matrix</code> instance.<sup id="fnref:dims"><a href="#fn:dims" rel="footnote">4</a></sup>
 The <code>vMAT_cast</code> function (or operator, if you prefer) marshals <code>X</code> into a
 <code>vMAT_Array</code> for further processing. In this case, we just log it to the console:</p>
 
-<pre><code>2013-04-13 09:28:52.902 otest[93332:303] &lt;vMAT_SingleArray: 0x103a92890; size: [4 3]&gt; = 
-  4   9 169
-121 100  64
- 49  36 144
-196 225   1
-</code></pre>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="console"><span class="line"><span class="go">2013-04-13 09:28:52.902 otest[93332:303] &lt;vMAT_SingleArray: 0x103a92890; size: [4 3]&gt; = </span>
+</span><span class="line"><span class="go">  4   9 169</span>
+</span><span class="line"><span class="go">121 100  64</span>
+</span><span class="line"><span class="go"> 49  36 144</span>
+</span><span class="line"><span class="go">196 225   1</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>To instead verify the expected output (as a proper <strong>SenTestingKit</strong> test case should),
 the following snippet allocates <code>matXv</code> and then initializes it using Eigen’s <code>operator &lt;&lt;</code> notation.<sup id="fnref:iniM"><a href="#fn:iniM" rel="footnote">5</a></sup></p>
 
-<pre><code>vMAT_Array * matXv = [vMAT_Array arrayWithSize:vMAT_MakeSize(4, 3)
-                                          type:miSINGLE];
-Mat&lt;float&gt; Xv = matXv;
-Xv &lt;&lt;
-  4,   9, 169,
-121, 100,  64,
- 49,  36, 144,
-196, 225,   1;
-STAssertEqualObjects(matX, matXv, @"Ensure equal arrays");
-</code></pre>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class="objc"><span class="line"><span class="n">vMAT_Array</span> <span class="o">*</span> <span class="n">matXv</span> <span class="o">=</span> <span class="p">[</span><span class="n">vMAT_Array</span> <span class="nl">arrayWithSize:</span><span class="n">vMAT_MakeSize</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</span><span class="line">                                          <span class="nl">type:</span><span class="n">miSINGLE</span><span class="p">];</span>
+</span><span class="line"><span class="n">Mat</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span> <span class="n">Xv</span> <span class="o">=</span> <span class="n">matXv</span><span class="p">;</span>
+</span><span class="line"><span class="n">Xv</span> <span class="o">&lt;&lt;</span>
+</span><span class="line">  <span class="mi">4</span><span class="p">,</span>   <span class="mi">9</span><span class="p">,</span> <span class="mi">169</span><span class="p">,</span>
+</span><span class="line"><span class="mi">121</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span>  <span class="mi">64</span><span class="p">,</span>
+</span><span class="line"> <span class="mi">49</span><span class="p">,</span>  <span class="mi">36</span><span class="p">,</span> <span class="mi">144</span><span class="p">,</span>
+</span><span class="line"><span class="mi">196</span><span class="p">,</span> <span class="mi">225</span><span class="p">,</span>   <span class="mi">1</span><span class="p">;</span>
+</span><span class="line"><span class="n">STAssertEqualObjects</span><span class="p">(</span><span class="n">matX</span><span class="p">,</span> <span class="n">matXv</span><span class="p">,</span> <span class="s">@&quot;Ensure equal arrays&quot;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Readers unfamiliar with <strong>Eigen</strong> may be wondering at this point how its templates handle
 matrices whose dimensions are not known at compile-time. The short answer is that <code>Eigen::Dynamic</code>
@@ -229,14 +266,21 @@ between big-endian and little-endian platforms, etc.</p>
 In this instance, the <code>.mat</code> file was produced by <strong>MATLAB</strong>, and the workspace variable <code>"M"</code>
 contains the matrix result of the <strong>MATLAB</strong> command <code>M = magic(4)</code>.</p>
 
-<pre><code>NSURL * URL = [[NSBundle bundleForClass:[self class]] URLForResource:@"test-magic-4x4-v6"
-                                                       withExtension:@"mat"];
-NSError * error = nil;
-NSDictionary * workspace = vMAT_load(URL, @[ @"M" ], &amp;error);
-NSLog(@"workspace = %@", workspace);
-vMAT_Array * matM = [workspace variable:@"M"].matrix;
-STAssertNotNil(matM, @"Failed to load M");
-</code></pre>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="objc"><span class="line"><span class="n">NSURL</span> <span class="o">*</span> <span class="n">URL</span> <span class="o">=</span> <span class="p">[[</span><span class="n">NSBundle</span> <span class="nl">bundleForClass:</span><span class="p">[</span><span class="n">self</span> <span class="n">class</span><span class="p">]]</span> <span class="nl">URLForResource:</span><span class="s">@&quot;test-magic-4x4-v6&quot;</span>
+</span><span class="line">                                                       <span class="nl">withExtension:</span><span class="s">@&quot;mat&quot;</span><span class="p">];</span>
+</span><span class="line"><span class="n">NSError</span> <span class="o">*</span> <span class="n">error</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+</span><span class="line"><span class="n">NSDictionary</span> <span class="o">*</span> <span class="n">workspace</span> <span class="o">=</span> <span class="n">vMAT_load</span><span class="p">(</span><span class="n">URL</span><span class="p">,</span> <span class="err">@</span><span class="p">[</span> <span class="s">@&quot;M&quot;</span> <span class="p">],</span> <span class="o">&amp;</span><span class="n">error</span><span class="p">);</span>
+</span><span class="line"><span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;workspace = %@&quot;</span><span class="p">,</span> <span class="n">workspace</span><span class="p">);</span>
+</span><span class="line"><span class="n">vMAT_Array</span> <span class="o">*</span> <span class="n">matM</span> <span class="o">=</span> <span class="p">[</span><span class="n">workspace</span> <span class="nl">variable:</span><span class="s">@&quot;M&quot;</span><span class="p">].</span><span class="n">matrix</span><span class="p">;</span>
+</span><span class="line"><span class="n">STAssertNotNil</span><span class="p">(</span><span class="n">matM</span><span class="p">,</span> <span class="s">@&quot;Failed to load M&quot;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>The second argument to <code>vMAT_load</code> is an array of workspace variable names; here we’re loading
 only one variable, but more than one can be specified. If the <code>.mat</code> file contains variables that don’t
@@ -245,10 +289,13 @@ any variable in the <code>.mat</code> file, the returned <code>NSDictionary</cod
 
 <p>Here is what <code>workspace</code> looks like when it’s logged to the console by the above snippet:</p>
 
-<pre><code>2013-04-13 12:05:03.292 otest[8382:303] workspace = {
-    M = "&lt;vMAT_MATv5NumericArray: 0x101801380; mxClass: [6]mxDOUBLE_CLASS, size: [4 4], name: 'M'&gt;";
-}
-</code></pre>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="console"><span class="line"><span class="go">2013-04-13 12:05:03.292 otest[8382:303] workspace = {</span>
+</span><span class="line"><span class="go">    M = &quot;&lt;vMAT_MATv5NumericArray: 0x101801380; mxClass: [6]mxDOUBLE_CLASS, size: [4 4], name: &#39;M&#39;&gt;&quot;;</span>
+</span><span class="line"><span class="go">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>The <code>workspace</code> result normally points to an <code>NSDictionary</code>; the <em>keys</em> are
 the variable names that were matched as described above, and the <em>values</em> are instances
@@ -327,9 +374,11 @@ projects. The easiest way to get started with <strong>vMAT</strong> is to join i
 
 <p>The minimum <strong>PodFile</strong> for specifying that your <strong>Xcode</strong> project depends on <strong>vMAT</strong> looks like this:</p>
 
-<pre><code>platform :osx, '10.8'
-pod 'vMAT', '~&gt; 0.0.1'
-</code></pre>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">platform</span> <span class="ss">:osx</span><span class="p">,</span> <span class="s1">&#39;10.8&#39;</span>
+</span><span class="line"><span class="n">pod</span> <span class="s1">&#39;vMAT&#39;</span><span class="p">,</span> <span class="s1">&#39;~&gt; 0.0.1&#39;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>There is a <a href="https://github.com/kaelin/vMAT/wiki/FAQ"><strong>vMAT FAQ</strong></a> that covers common installation
 issues and other topics of interest to new users.</p>
@@ -478,6 +527,15 @@ issues and other topics of interest to new users.</p>
   </h1>
 </section>
 
+
+
+<section>
+  <h1>On Twitter:</h1>
+  <div>
+    <p><br /><a href="http://twitter.com/KColclasure" target="_blank">My Tweets, on Twitter.</a></p>
+    <a href="http://twitter.com/KColclasure" class="twitter-follow-button" data-show-count="">Follow @KColclasure</a>
+  </div>
+</section>
 
 
   

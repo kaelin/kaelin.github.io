@@ -4,7 +4,7 @@
   <title><![CDATA[Category: posts | kaelin]]></title>
   <link href="http://kaelin.github.io/blog/categories/posts/atom.xml" rel="self"/>
   <link href="http://kaelin.github.io/"/>
-  <updated>2013-04-28T07:56:35-07:00</updated>
+  <updated>2013-04-28T09:33:42-07:00</updated>
   <id>http://kaelin.github.io/</id>
   <author>
     <name><![CDATA[Kaelin Colclasure]]></name>
@@ -120,7 +120,8 @@ metadata describing the array.</p>
 <p>The <code>vMAT_Array</code> class serves exactly this purpose. This code snippet shows one way<sup id="fnref:pedagogy"><a href="#fn:pedagogy" rel="footnote">2</a></sup> an instance may be created
 and initialized:</p>
 
-<pre><code>const float iniM[] = {
+<p><code>objc
+const float iniM[] = {
      2, 11,  7, 14,
      3, 10,  6, 15,
     13,  8, 12,  1,
@@ -129,16 +130,17 @@ vMAT_Array * matM = [vMAT_Array arrayWithSize:vMAT_MakeSize(4, 3)
                                          type:miSINGLE
                                          data:[NSData dataWithBytes:iniM length:sizeof(iniM)]];
 NSLog(@"%@", matM.dump);
-</code></pre>
+</code></p>
 
 <p>And here is what gets output to the console when the above snippet is executed:</p>
 
-<pre><code>2013-04-13 09:28:52.901 otest[93332:303] &lt;vMAT_SingleArray: 0x10053f380; size: [4 3]&gt; = 
+<p><code>console
+2013-04-13 09:28:52.901 otest[93332:303] &lt;vMAT_SingleArray: 0x10053f380; size: [4 3]&gt; = 
  2  3 13
 11 10  8
  7  6 12
 14 15  1
-</code></pre>
+</code></p>
 
 <p>There are a couple of important things to note here: First, the console output appears transposed from
 the <code>float M[]</code> initializer used above. That’s because <strong>vMAT</strong> arrays are stored in <em>column-major</em> order,
@@ -158,7 +160,8 @@ and <strong>Eigen</strong> objects.</p>
 <p>This is the role of the <code>vMAT::Mat</code> template class. This snippet uses an overload of <code>operator *</code>
 provided by <strong>Eigen</strong> to compute the element-wise square of <code>matM</code> as defined above:</p>
 
-<pre><code>namespace {    
+<p><code>objc
+namespace {    
     using namespace Eigen;
     using namespace vMAT;
 }
@@ -167,23 +170,25 @@ Mat&lt;float&gt; M = matM;
 Matrix&lt;float, 4, 3&gt; X = M.array() * M.array();
 vMAT_Array * matX = vMAT_cast(X);
 NSLog(@"%@", matX.dump);
-</code></pre>
+</code></p>
 
 <p>Here the <code>X</code> variable used to receive the matrix multiplication result is a “plain” <code>Eigen::Matrix</code> instance.<sup id="fnref:dims"><a href="#fn:dims" rel="footnote">4</a></sup>
 The <code>vMAT_cast</code> function (or operator, if you prefer) marshals <code>X</code> into a
 <code>vMAT_Array</code> for further processing. In this case, we just log it to the console:</p>
 
-<pre><code>2013-04-13 09:28:52.902 otest[93332:303] &lt;vMAT_SingleArray: 0x103a92890; size: [4 3]&gt; = 
+<p><code>console
+2013-04-13 09:28:52.902 otest[93332:303] &lt;vMAT_SingleArray: 0x103a92890; size: [4 3]&gt; = 
   4   9 169
 121 100  64
  49  36 144
 196 225   1
-</code></pre>
+</code></p>
 
 <p>To instead verify the expected output (as a proper <strong>SenTestingKit</strong> test case should),
 the following snippet allocates <code>matXv</code> and then initializes it using Eigen’s <code>operator &lt;&lt;</code> notation.<sup id="fnref:iniM"><a href="#fn:iniM" rel="footnote">5</a></sup></p>
 
-<pre><code>vMAT_Array * matXv = [vMAT_Array arrayWithSize:vMAT_MakeSize(4, 3)
+<p><code>objc
+vMAT_Array * matXv = [vMAT_Array arrayWithSize:vMAT_MakeSize(4, 3)
                                           type:miSINGLE];
 Mat&lt;float&gt; Xv = matXv;
 Xv &lt;&lt;
@@ -192,7 +197,7 @@ Xv &lt;&lt;
  49,  36, 144,
 196, 225,   1;
 STAssertEqualObjects(matX, matXv, @"Ensure equal arrays");
-</code></pre>
+</code></p>
 
 <p>Readers unfamiliar with <strong>Eigen</strong> may be wondering at this point how its templates handle
 matrices whose dimensions are not known at compile-time. The short answer is that <code>Eigen::Dynamic</code>
@@ -213,14 +218,15 @@ between big-endian and little-endian platforms, etc.</p>
 In this instance, the <code>.mat</code> file was produced by <strong>MATLAB</strong>, and the workspace variable <code>"M"</code>
 contains the matrix result of the <strong>MATLAB</strong> command <code>M = magic(4)</code>.</p>
 
-<pre><code>NSURL * URL = [[NSBundle bundleForClass:[self class]] URLForResource:@"test-magic-4x4-v6"
+<p><code>objc
+NSURL * URL = [[NSBundle bundleForClass:[self class]] URLForResource:@"test-magic-4x4-v6"
                                                        withExtension:@"mat"];
 NSError * error = nil;
 NSDictionary * workspace = vMAT_load(URL, @[ @"M" ], &amp;error);
 NSLog(@"workspace = %@", workspace);
 vMAT_Array * matM = [workspace variable:@"M"].matrix;
 STAssertNotNil(matM, @"Failed to load M");
-</code></pre>
+</code></p>
 
 <p>The second argument to <code>vMAT_load</code> is an array of workspace variable names; here we’re loading
 only one variable, but more than one can be specified. If the <code>.mat</code> file contains variables that don’t
@@ -229,10 +235,11 @@ any variable in the <code>.mat</code> file, the returned <code>NSDictionary</cod
 
 <p>Here is what <code>workspace</code> looks like when it’s logged to the console by the above snippet:</p>
 
-<pre><code>2013-04-13 12:05:03.292 otest[8382:303] workspace = {
+<p><code>console
+2013-04-13 12:05:03.292 otest[8382:303] workspace = {
     M = "&lt;vMAT_MATv5NumericArray: 0x101801380; mxClass: [6]mxDOUBLE_CLASS, size: [4 4], name: 'M'&gt;";
 }
-</code></pre>
+</code></p>
 
 <p>The <code>workspace</code> result normally points to an <code>NSDictionary</code>; the <em>keys</em> are
 the variable names that were matched as described above, and the <em>values</em> are instances
@@ -311,9 +318,10 @@ projects. The easiest way to get started with <strong>vMAT</strong> is to join i
 
 <p>The minimum <strong>PodFile</strong> for specifying that your <strong>Xcode</strong> project depends on <strong>vMAT</strong> looks like this:</p>
 
-<pre><code>platform :osx, '10.8'
+<p><code>ruby
+platform :osx, '10.8'
 pod 'vMAT', '~&gt; 0.0.1'
-</code></pre>
+</code></p>
 
 <p>There is a <a href="https://github.com/kaelin/vMAT/wiki/FAQ"><strong>vMAT FAQ</strong></a> that covers common installation
 issues and other topics of interest to new users.</p>
