@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[kaelin]]></title>
+  <link href="http://kaelin.github.io/atom.xml" rel="self"/>
+  <link href="http://kaelin.github.io/"/>
+  <updated>2013-04-28T07:49:18-07:00</updated>
+  <id>http://kaelin.github.io/</id>
+  <author>
+    <name><![CDATA[Kaelin Colclasure]]></name>
+    <email><![CDATA[kaelin@acm.org]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Generating Objective-C code with a ruby DSL]]></title>
+    <link href="http://kaelin.github.io/blog/2013/04/25/generating-code-with-a-ruby-dsl/"/>
+    <updated>2013-04-25T00:00:00-07:00</updated>
+    <id>http://kaelin.github.io/blog/2013/04/25/generating-code-with-a-ruby-dsl</id>
+    <content type="html"><![CDATA[<p><strong>vMAT</strong> uses a <strong>ruby</strong> DSL to do code generation for certain repetitive code patterns. For example, the way coercions between matrices of different types is handled (dynamically, at runtime<sup id="fnref:kthx"><a href="#fn:kthx" rel="footnote">1</a></sup>) currently requires implementing an <strong>Objective-C++</strong> <em>dispatch</em> method to copy <em>to</em> every numeric type <em>from</em> every numeric type. With 10 distinct numeric types that is 100 <strong>Objective-C++</strong> methods that are <em>slight</em> variations of the same method template.</p>
+
+<p>This is the problem that <strong>vMATCodeMonkey</strong> was designed to solve. <!-- more -->Given the following specification in the file <code>copyFromMethods.mk</code><sup id="fnref:exts"><a href="#fn:exts" rel="footnote">2</a></sup>:</p>
+
+<div><script src="https://gist.github.com/5474962.js"></script>
+<noscript><pre><code /></pre></noscript></div>
+
+<p><strong>vMATCodeMonkey</strong> produces 100 methods are all slight variations on this one:</p>
+
+<div><script src="https://gist.github.com/5474979.js"></script>
+<noscript><pre><code /></pre></noscript></div>
+
+<p>“That’s not very Impressive”, I hear you saying. Okay, let’s look at a more complex (but still highly repetitive) coding task: Parsing all those <code>vMAT_API</code> function’s <code>options</code> arrays.</p>
+
+<p>Given this specification from <code>clusterOptions.mk</code>:</p>
+
+<div><script src="https://gist.github.com/5475036.js"></script>
+<noscript><pre><code /></pre></noscript></div>
+
+<p><strong>vMATCodeMonkey</strong> produces the following code:</p>
+
+<div><script src="https://gist.github.com/5475028.js"></script>
+<noscript><pre><code /></pre></noscript></div>
+
+<p>As you can see, in this case the DSL specification looks nothing at all like the generated <strong>Objective-C</strong> code.</p>
+
+<p>Both of these examples essentially entail boilerplate code. And it’s the <em>kind</em> of boilerplate that tends to get programmers in trouble; it’s clearly crying out for abstraction, but what <em>kind</em> of abstraction?</p>
+
+<p>In a germinal version of <strong>vMAT</strong> (from even before embracing <strong>Objective-C++</strong>) I used the following idiom to implement the very first of the dispatch methods from the first example:</p>
+
+<div><script src="https://gist.github.com/5475264.js"></script>
+<noscript><pre><code /></pre></noscript></div>
+
+<p>Clearly, this was disaster waiting to happen. Even with those <em>ugly</em> macros each copy &amp; paste instantiation of this “template” needed to be carefully edited in <em>four</em> places. Unsurprisingly, it was exactly this exercise that pushed me over the barrier and into the realm of <strong>Objective-C++</strong>. But how much did templates really improve things?</p>
+
+<p>Well, only by half, obviously. <strong>C++</strong> allowed me to create the overloaded <code>copyFrom</code> function that is still used in the generated code. But there was still no way to template-ize those <strong>Objective-C</strong> selectors. And that’s where the first incarnation of <strong>vMATCodeMonkey</strong> entered the scene.</p>
+
+<div><script src="https://gist.github.com/5475290.js"></script>
+<noscript><pre><code /></pre></noscript></div>
+
+<p>Not a DSL at all; just a quick <strong>ruby</strong> script to complete what would otherwise be an annoying and error-prone task.<sup id="fnref:hacks"><a href="#fn:hacks" rel="footnote">3</a></sup> But once you set foot down this path, it’s hard to stop.</p>
+
+<p>In a (perhaps distant) future post, I’ll walk through a dissection of the current implementation of <a href="https://github.com/kaelin/vMAT/blob/master/ruby/vMATCodeMonkey.rb"><strong>vMATCodeMonkey</strong></a>. Not that I think it’s a model implementation or anything, mind you. I’ve only been writing <strong>ruby</strong> code for a short time, and I certainly could not have completed this task without lots of assistance from the <strong>ruby</strong> community of <a href="http://stackoverflow.com/questions/tagged/ruby">StackOverflow</a>. But I believe it’s a testament to the versatility of the language that <em>even I, as a relative n00bie @ <strong>ruby</strong></em> was able to make this useful-if-highly-specialized tool. [Not that there weren’t a few speed bumps along the way. I’ll talk about those too.]</p>
+
+<hr />
+<div class="footnotes">
+  <ol>
+    <li id="fn:kthx">
+      <p>While <strong>C++</strong> templates are a useful tool for handling repetitive code generation at <em>compile-time</em>, they can’t solve this particular <strong>vMAT</strong> challenge; there’s no notion of method overloading in <strong>Objective-C</strong>.<a href="#fnref:kthx" rel="reference">&#8617;</a></p>
+    </li>
+    <li id="fn:exts">
+      <p>The extensions of the filenames of <strong>gists</strong> included in this article differ from the names used in <strong>vMAT</strong>’s code base. This was done to get more appropriate syntax highlighting.<a href="#fnref:exts" rel="reference">&#8617;</a></p>
+    </li>
+    <li id="fn:hacks">
+      <p>I’d bet that’s how a lot of <strong>ruby</strong> DSLs got their start.<a href="#fnref:hacks" rel="reference">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[The vMAT Manifesto]]></title>
+    <link href="http://kaelin.github.io/blog/2013/04/13/the-vmat-manifesto/"/>
+    <updated>2013-04-13T00:00:00-07:00</updated>
+    <id>http://kaelin.github.io/blog/2013/04/13/the-vmat-manifesto</id>
+    <content type="html"><![CDATA[<p>The <a href="http://kaelin.github.io/vMAT"><strong>vMAT</strong></a> library is intended to make moving code and data between <strong>MATLAB</strong><sup id="fnref:tm"><a href="#fn:tm" rel="footnote">1</a></sup> and <strong>Objective-C++</strong>
+apps as straightforward and painless as possible.</p>
+
+<ul>
+  <li>The <code>vMAT_Array</code> class provides an <strong>Objective-C</strong> container type encapsulating matrices and arrays.</li>
+  <li>Overloaded operators and core numerical algorithms are provided by the <a href="http://eigen.tuxfamily.org"><strong>Eigen</strong></a>
+<strong>C++</strong> template library; the <code>vMAT::Mat</code> template class provides <strong>C++</strong> code access to the contents of a
+<code>vMAT_Array</code> as an <code>Eigen::Map</code> matrix.</li>
+  <li>The <code>vMAT_load</code> and <code>vMAT_save</code> API functions provide read/write access to <strong>MATLAB</strong>’s <code>.mat</code> files for
+array data storage.</li>
+  <li>A small (but growing) library of commonly-used <strong>MATLAB</strong> functions are provided as <strong>C</strong>-style
+<code>vMAT_API</code> functions.</li>
+  <li>The library is packaged using <a href="http://cocoapods.org"><strong>CocoaPods</strong></a> for convenient dependency management,
+  	and distributed under the <a href="http://opensource.org"><strong>OSI</strong></a>-approved, commercial-developer-friendly
+<a href="http://opensource.org/licenses/BSD-2-Clause"><strong>BSD</strong> 2-Clause License</a>.</li>
+</ul>
+
+<!-- more -->
+
+<h3 id="the-vmatarray-class">The vMAT_Array Class</h3>
+
+<p>The “classical” approach to managing numeric arrays in <strong>Objective-C</strong> is to marshal them
+as <code>NSData</code> objects. This works pretty well if you’re only dealing with a small number of
+relatively uniform array types (say for instance, <code>float</code> vectors); but when you want to
+introduce more generalized matrices, it makes sense to introduce a class that carries along
+metadata describing the array.</p>
+
+<p>The <code>vMAT_Array</code> class serves exactly this purpose. This code snippet shows one way<sup id="fnref:pedagogy"><a href="#fn:pedagogy" rel="footnote">2</a></sup> an instance may be created
+and initialized:</p>
+
+<pre><code>const float iniM[] = {
+     2, 11,  7, 14,
+     3, 10,  6, 15,
+    13,  8, 12,  1,
+};
+vMAT_Array * matM = [vMAT_Array arrayWithSize:vMAT_MakeSize(4, 3)
+                                         type:miSINGLE
+                                         data:[NSData dataWithBytes:iniM length:sizeof(iniM)]];
+NSLog(@"%@", matM.dump);
+</code></pre>
+
+<p>And here is what gets output to the console when the above snippet is executed:</p>
+
+<pre><code>2013-04-13 09:28:52.901 otest[93332:303] &lt;vMAT_SingleArray: 0x10053f380; size: [4 3]&gt; = 
+ 2  3 13
+11 10  8
+ 7  6 12
+14 15  1
+</code></pre>
+
+<p>There are a couple of important things to note here: First, the console output appears transposed from
+the <code>float M[]</code> initializer used above. That’s because <strong>vMAT</strong> arrays are stored in <em>column-major</em> order,
+as is common for numerical libraries (but often dismaying to <strong>C</strong> programmers<sup id="fnref:dismay"><a href="#fn:dismay" rel="footnote">3</a></sup>). Second, the
+<code>vMAT_Array</code> class is actually a <em>class cluster</em> (as is evident from the <code>vMAT_SingleArray</code> class
+name shown in the console log).</p>
+
+<h3 id="the-vmatmat-eigen-adaptor-class">The vMAT::Mat Eigen Adaptor Class</h3>
+
+<p>While <code>vMAT_Array</code> instances are convenient for marshaling numeric data, <strong>Objective-C</strong> isn’t
+a very good language for actually implementing numeric algorithms; that’s where <strong>Objective-C++</strong>
+comes into its own. Thanks to the ability to (mostly) freely mix <strong>Objective-C</strong> and <strong>C++</strong> code
+in the same source file, <strong>vMAT</strong> is able to let the <strong>Eigen</strong> template library do all the
+heavy lifting. All that’s needed is an adaptor class that maps between <code>vMAT_Array</code> instances
+and <strong>Eigen</strong> objects.</p>
+
+<p>This is the role of the <code>vMAT::Mat</code> template class. This snippet uses an overload of <code>operator *</code>
+provided by <strong>Eigen</strong> to compute the element-wise square of <code>matM</code> as defined above:</p>
+
+<pre><code>namespace {    
+    using namespace Eigen;
+    using namespace vMAT;
+}
+⋮
+Mat&lt;float&gt; M = matM;
+Matrix&lt;float, 4, 3&gt; X = M.array() * M.array();
+vMAT_Array * matX = vMAT_cast(X);
+NSLog(@"%@", matX.dump);
+</code></pre>
+
+<p>Here the <code>X</code> variable used to receive the matrix multiplication result is a “plain” <code>Eigen::Matrix</code> instance.<sup id="fnref:dims"><a href="#fn:dims" rel="footnote">4</a></sup>
+The <code>vMAT_cast</code> function (or operator, if you prefer) marshals <code>X</code> into a
+<code>vMAT_Array</code> for further processing. In this case, we just log it to the console:</p>
+
+<pre><code>2013-04-13 09:28:52.902 otest[93332:303] &lt;vMAT_SingleArray: 0x103a92890; size: [4 3]&gt; = 
+  4   9 169
+121 100  64
+ 49  36 144
+196 225   1
+</code></pre>
+
+<p>To instead verify the expected output (as a proper <strong>SenTestingKit</strong> test case should),
+the following snippet allocates <code>matXv</code> and then initializes it using Eigen’s <code>operator &lt;&lt;</code> notation.<sup id="fnref:iniM"><a href="#fn:iniM" rel="footnote">5</a></sup></p>
+
+<pre><code>vMAT_Array * matXv = [vMAT_Array arrayWithSize:vMAT_MakeSize(4, 3)
+                                          type:miSINGLE];
+Mat&lt;float&gt; Xv = matXv;
+Xv &lt;&lt;
+  4,   9, 169,
+121, 100,  64,
+ 49,  36, 144,
+196, 225,   1;
+STAssertEqualObjects(matX, matXv, @"Ensure equal arrays");
+</code></pre>
+
+<p>Readers unfamiliar with <strong>Eigen</strong> may be wondering at this point how its templates handle
+matrices whose dimensions are not known at compile-time. The short answer is that <code>Eigen::Dynamic</code>
+may be specified in place of either or both the <code>rows</code> and <code>columns</code> template arguments.
+When the number of rows or columns <em>is</em> known at compile-time, specifying it in the template
+type instantiation results both in more efficient code, and in compile-time and run-time checks
+of the matrix dimensions.</p>
+
+<h3 id="loading-arrays">Loading Arrays</h3>
+
+<p>Specifying array contents in source code as compile-time constants is convenient for small
+matrices, but impractical for larger arrays. <strong>vMAT</strong> provides two basic ways of loading (and saving) arrays:
+raw binary file I/O and the ability to read and write <strong>MATLAB</strong> v5-compatible <code>.mat</code> files. The latter is
+generally preferred, as it preserves array metadata, allows files to be exchanged
+between big-endian and little-endian platforms, etc.</p>
+
+<p>The following snippet loads a single matrix variable from a <code>.mat</code> file bundled with a test case.
+In this instance, the <code>.mat</code> file was produced by <strong>MATLAB</strong>, and the workspace variable <code>"M"</code>
+contains the matrix result of the <strong>MATLAB</strong> command <code>M = magic(4)</code>.</p>
+
+<pre><code>NSURL * URL = [[NSBundle bundleForClass:[self class]] URLForResource:@"test-magic-4x4-v6"
+                                                       withExtension:@"mat"];
+NSError * error = nil;
+NSDictionary * workspace = vMAT_load(URL, @[ @"M" ], &amp;error);
+NSLog(@"workspace = %@", workspace);
+vMAT_Array * matM = [workspace variable:@"M"].matrix;
+STAssertNotNil(matM, @"Failed to load M");
+</code></pre>
+
+<p>The second argument to <code>vMAT_load</code> is an array of workspace variable names; here we’re loading
+only one variable, but more than one can be specified. If the <code>.mat</code> file contains variables that don’t
+match an entry in the array, they are skipped. If the array contains names that don’t match
+any variable in the <code>.mat</code> file, the returned <code>NSDictionary</code> will not contain that name as a <em>key</em>.</p>
+
+<p>Here is what <code>workspace</code> looks like when it’s logged to the console by the above snippet:</p>
+
+<pre><code>2013-04-13 12:05:03.292 otest[8382:303] workspace = {
+    M = "&lt;vMAT_MATv5NumericArray: 0x101801380; mxClass: [6]mxDOUBLE_CLASS, size: [4 4], name: 'M'&gt;";
+}
+</code></pre>
+
+<p>The <code>workspace</code> result normally points to an <code>NSDictionary</code>; the <em>keys</em> are
+the variable names that were matched as described above, and the <em>values</em> are instances
+of the <code>vMAT_MATv5Variable</code> class cluster. For our purposes here, the only salient functionality
+of that cluster is that it has a <code>-matrix</code> accessor method which returns a <code>vMAT_Array</code>.</p>
+
+<p>The <code>error</code> result (customarily ignored above) will normally be <code>nil</code>, but will point to an <code>NSError</code> if there’s
+any problem opening <code>URL</code>, reading from the resulting <code>NSInputStream</code> or parsing the stream’s
+contents. Per the usual conventions, if an error occurs the <code>workspace</code> result may also be <code>nil</code>.</p>
+
+<p>Saving an array (unsurprisingly) requires first marshaling it into a <code>workspace</code> dictionary
+as a <code>vMAT_MATv5Variable</code>, then calling <code>vMAT_save</code>.</p>
+
+<h3 id="the-vmatapi-functions">The vMAT_API Functions</h3>
+
+<p>The most daunting part of porting code developed in <strong>MATLAB</strong> to <strong>Objective-C++</strong> (or to <em>any</em> other language)
+is re-implementing all of those <em>wonderful</em> toolbox functions. If only there were a collection of open-source
+equivalents being assembled somewhere… Well, that’s exactly what <strong>vMAT</strong> hopes to be when it grows up.</p>
+
+<p>Here are a few of the <code>vMAT_API</code> functions available in the pre-1.0
+<a href="https://github.com/kaelin/vMAT/issues?milestone=1&amp;state=closed"><strong>Bootstrap</strong></a> release:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>MATLAB</th>
+      <th>vMAT_API</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>double(X)</code></td>
+      <td><code>vMAT_double(X)</code></td>
+      <td><code>X</code> is <em>coerced</em> to double-precision floating point; if <code>X</code> was not <em>already</em> in that format, this allocates and returns a new matrix.</td>
+    </tr>
+    <tr>
+      <td><code>eye(3)</code></td>
+      <td><code>vMAT_eye(vMAT_MakeSize(3), nil)</code></td>
+      <td>The additional argument, <code>nil</code> here, allows an array type specification.<sup id="fnref:atspec"><a href="#fn:atspec" rel="footnote">6</a></sup></td>
+    </tr>
+    <tr>
+      <td><code>find(Y)</code></td>
+      <td><code>vMAT_find(Y, nil)</code></td>
+      <td><code>Y</code> is <em>coerced</em> to a logical array. See the documentation for supported options.</td>
+    </tr>
+    <tr>
+      <td><code>X'</code></td>
+      <td><code>X.mtrans</code> or <code>vMAT_mtrans(X)</code></td>
+      <td>The functional version is guaranteed not to modify <code>X</code>; the property <em>makes no such guarantee (!) <strong>but may still return a new matrix!</strong></em></td>
+    </tr>
+    <tr>
+      <td><code>pdist(X)</code></td>
+      <td><code>vMAT_pdist(X.mtrans)</code></td>
+      <td>Some <strong>vMAT</strong> functions take arguments transposed from their <strong>MATLAB</strong> equivalents.<sup id="fnref:mtrans"><a href="#fn:mtrans" rel="footnote">7</a></sup></td>
+    </tr>
+    <tr>
+      <td><code>single(X)</code></td>
+      <td><code>vMAT_single(X)</code></td>
+      <td><code>X</code> is <em>coerced</em> to single-precision floating point; if <code>X</code> was not <em>already</em> in that format, this allocates and returns a new matrix.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The table above is meager, yes; but it’s just a small sampling of the growing collection of <code>vMAT_API</code> functions.
+There are more being added all the time. If a function you need isn’t already included in <strong>vMAT</strong>,
+chances are some bits and pieces you could use to write it yourself <em>are</em>; and you can
+choose to contribute your own implementations back to <strong>vMAT</strong> or not. <strong>vMAT</strong> is distributed
+under an <a href="http://opensource.org"><strong>OSI</strong></a>-approved, commercial-developer-friendly
+<a href="http://opensource.org/licenses/BSD-2-Clause"><strong>BSD</strong> 2-Clause License</a>.</p>
+
+<h3 id="getting-started-with-vmat">Getting Started with vMAT</h3>
+
+<p><strong>CocoaPods</strong> is what the cool kids are using these days to manage dependencies for <strong>iOS</strong> and <strong>Mac OS X</strong>
+projects. The easiest way to get started with <strong>vMAT</strong> is to join in the fun.</p>
+
+<p>The minimum <strong>PodFile</strong> for specifying that your <strong>Xcode</strong> project depends on <strong>vMAT</strong> looks like this:</p>
+
+<pre><code>platform :osx, '10.8'
+pod 'vMAT', '~&gt; 0.0.1'
+</code></pre>
+
+<p>There is a <a href="https://github.com/kaelin/vMAT/wiki/FAQ"><strong>vMAT FAQ</strong></a> that covers common installation
+issues and other topics of interest to new users.</p>
+
+<hr />
+<div class="footnotes">
+  <ol>
+    <li id="fn:tm">
+      <p><strong>MATLAB</strong>™® is a registered trademark of <strong><a href="http://www.mathworks.com/products/matlab/">The MathWorks, Inc.</a></strong><a href="#fnref:tm" rel="reference">&#8617;</a></p>
+    </li>
+    <li id="fn:pedagogy">
+      <p>In interests of pedagogy, the code snippets in this document <em>do not</em> (necessarily) represent recommended <strong>vMAT</strong> coding practices. For example, the earliest snippets forego the use of convenience functions that haven’t been introduced yet, and all of the examples ignore potential efficiency concerns when doing so makes the intent of the code more clear.<a href="#fnref:pedagogy" rel="reference">&#8617;</a></p>
+    </li>
+    <li id="fn:dismay">
+      <p>At least <strong>I</strong> found it dismaying, to the point that I initially used the more familiar <em>row-major</em> ordering of <strong>C</strong>; but I soon found I was constantly needing to transpose array data imported from <strong>MATLAB</strong>, and then transpose it again before passing it along to <strong>BLAS</strong> or <strong>LAPACK</strong> routines. The last straw for me was discovering that <strong>Eigen</strong> also expected <em>column-major</em> array storage.<a href="#fnref:dismay" rel="reference">&#8617;</a></p>
+    </li>
+    <li id="fn:dims">
+      <p>Note that the <code>Eigen::Matrix</code> template instantiation requires you to specify the matrix dimensions, while the <code>vMAT::Mat</code> template defaults the <code>rows</code> and <code>columns</code> parameters to <code>Eigen::Dynamic</code>.<a href="#fnref:dims" rel="reference">&#8617;</a></p>
+    </li>
+    <li id="fn:iniM">
+      <p>Note that, unlike the first example snippet, the matrix now appears in the <strong>Objective-C++</strong> source code in the same order (<em>column-major</em>) that it appears in the log output. For reasons which I hope are obvious, this is the preferred way to initialize matrices from source constants.<a href="#fnref:iniM" rel="reference">&#8617;</a></p>
+    </li>
+    <li id="fn:atspec">
+      <p>Actually <strong>MATLAB</strong> <em>also</em> accepts an array type specification; but <strong>MATLAB</strong> allows for more dynamic argument handling than <strong>Objective-C</strong> does. <strong>vMAT</strong>’s compromise usually involves marshalling optional arguments into an <code>NSArray</code>;  when no options are desired, <code>nil</code> can take the place of the empty array.<a href="#fnref:atspec" rel="reference">&#8617;</a></p>
+    </li>
+    <li id="fn:mtrans">
+      <p>Sometimes this is done to optimize for vectorization; specifically to be able to call <strong>vDSP</strong> functions with unit strides. And sometimes it’s done because the <strong>vMAT</strong> function usually used to prepare the input matrix produces output transposed from <em>its</em> <strong>MATLAB</strong> equivalent. And sometimes it’s an expression of personal preference on the part of your humble author; but not usually.<a href="#fnref:mtrans" rel="reference">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+]]></content>
+  </entry>
+  
+</feed>

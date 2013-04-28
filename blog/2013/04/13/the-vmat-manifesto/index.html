@@ -1,0 +1,533 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>The vMAT Manifesto - kaelin</title>
+  <meta name="author" content="Kaelin Colclasure">
+
+  
+  <meta name="description" content="The vMAT library is intended to make moving code and data between MATLAB1 and Objective-C++
+apps as straightforward and painless as possible. The &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://kaelin.github.io/blog/2013/04/13/the-vmat-manifesto">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="kaelin" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-39966900-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">kaelin</a></h1>
+  
+    <h2>Projects, code, tutorials, opinions and other random bits</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:kaelin.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">The vMAT Manifesto</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-13T00:00:00-07:00" pubdate data-updated="true">Apr 13<span>th</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>The <a href="/vMAT"><strong>vMAT</strong></a> library is intended to make moving code and data between <strong>MATLAB</strong><sup id="fnref:tm"><a href="#fn:tm" rel="footnote">1</a></sup> and <strong>Objective-C++</strong>
+apps as straightforward and painless as possible.</p>
+
+<ul>
+  <li>The <code>vMAT_Array</code> class provides an <strong>Objective-C</strong> container type encapsulating matrices and arrays.</li>
+  <li>Overloaded operators and core numerical algorithms are provided by the <a href="http://eigen.tuxfamily.org"><strong>Eigen</strong></a>
+<strong>C++</strong> template library; the <code>vMAT::Mat</code> template class provides <strong>C++</strong> code access to the contents of a
+<code>vMAT_Array</code> as an <code>Eigen::Map</code> matrix.</li>
+  <li>The <code>vMAT_load</code> and <code>vMAT_save</code> API functions provide read/write access to <strong>MATLAB</strong>’s <code>.mat</code> files for
+array data storage.</li>
+  <li>A small (but growing) library of commonly-used <strong>MATLAB</strong> functions are provided as <strong>C</strong>-style
+<code>vMAT_API</code> functions.</li>
+  <li>The library is packaged using <a href="http://cocoapods.org"><strong>CocoaPods</strong></a> for convenient dependency management,
+  	and distributed under the <a href="http://opensource.org"><strong>OSI</strong></a>-approved, commercial-developer-friendly
+<a href="http://opensource.org/licenses/BSD-2-Clause"><strong>BSD</strong> 2-Clause License</a>.</li>
+</ul>
+
+<!-- more -->
+
+<h3 id="the-vmatarray-class">The vMAT_Array Class</h3>
+
+<p>The “classical” approach to managing numeric arrays in <strong>Objective-C</strong> is to marshal them
+as <code>NSData</code> objects. This works pretty well if you’re only dealing with a small number of
+relatively uniform array types (say for instance, <code>float</code> vectors); but when you want to
+introduce more generalized matrices, it makes sense to introduce a class that carries along
+metadata describing the array.</p>
+
+<p>The <code>vMAT_Array</code> class serves exactly this purpose. This code snippet shows one way<sup id="fnref:pedagogy"><a href="#fn:pedagogy" rel="footnote">2</a></sup> an instance may be created
+and initialized:</p>
+
+<pre><code>const float iniM[] = {
+     2, 11,  7, 14,
+     3, 10,  6, 15,
+    13,  8, 12,  1,
+};
+vMAT_Array * matM = [vMAT_Array arrayWithSize:vMAT_MakeSize(4, 3)
+                                         type:miSINGLE
+                                         data:[NSData dataWithBytes:iniM length:sizeof(iniM)]];
+NSLog(@"%@", matM.dump);
+</code></pre>
+
+<p>And here is what gets output to the console when the above snippet is executed:</p>
+
+<pre><code>2013-04-13 09:28:52.901 otest[93332:303] &lt;vMAT_SingleArray: 0x10053f380; size: [4 3]&gt; = 
+ 2  3 13
+11 10  8
+ 7  6 12
+14 15  1
+</code></pre>
+
+<p>There are a couple of important things to note here: First, the console output appears transposed from
+the <code>float M[]</code> initializer used above. That’s because <strong>vMAT</strong> arrays are stored in <em>column-major</em> order,
+as is common for numerical libraries (but often dismaying to <strong>C</strong> programmers<sup id="fnref:dismay"><a href="#fn:dismay" rel="footnote">3</a></sup>). Second, the
+<code>vMAT_Array</code> class is actually a <em>class cluster</em> (as is evident from the <code>vMAT_SingleArray</code> class
+name shown in the console log).</p>
+
+<h3 id="the-vmatmat-eigen-adaptor-class">The vMAT::Mat Eigen Adaptor Class</h3>
+
+<p>While <code>vMAT_Array</code> instances are convenient for marshaling numeric data, <strong>Objective-C</strong> isn’t
+a very good language for actually implementing numeric algorithms; that’s where <strong>Objective-C++</strong>
+comes into its own. Thanks to the ability to (mostly) freely mix <strong>Objective-C</strong> and <strong>C++</strong> code
+in the same source file, <strong>vMAT</strong> is able to let the <strong>Eigen</strong> template library do all the
+heavy lifting. All that’s needed is an adaptor class that maps between <code>vMAT_Array</code> instances
+and <strong>Eigen</strong> objects.</p>
+
+<p>This is the role of the <code>vMAT::Mat</code> template class. This snippet uses an overload of <code>operator *</code>
+provided by <strong>Eigen</strong> to compute the element-wise square of <code>matM</code> as defined above:</p>
+
+<pre><code>namespace {    
+    using namespace Eigen;
+    using namespace vMAT;
+}
+⋮
+Mat&lt;float&gt; M = matM;
+Matrix&lt;float, 4, 3&gt; X = M.array() * M.array();
+vMAT_Array * matX = vMAT_cast(X);
+NSLog(@"%@", matX.dump);
+</code></pre>
+
+<p>Here the <code>X</code> variable used to receive the matrix multiplication result is a “plain” <code>Eigen::Matrix</code> instance.<sup id="fnref:dims"><a href="#fn:dims" rel="footnote">4</a></sup>
+The <code>vMAT_cast</code> function (or operator, if you prefer) marshals <code>X</code> into a
+<code>vMAT_Array</code> for further processing. In this case, we just log it to the console:</p>
+
+<pre><code>2013-04-13 09:28:52.902 otest[93332:303] &lt;vMAT_SingleArray: 0x103a92890; size: [4 3]&gt; = 
+  4   9 169
+121 100  64
+ 49  36 144
+196 225   1
+</code></pre>
+
+<p>To instead verify the expected output (as a proper <strong>SenTestingKit</strong> test case should),
+the following snippet allocates <code>matXv</code> and then initializes it using Eigen’s <code>operator &lt;&lt;</code> notation.<sup id="fnref:iniM"><a href="#fn:iniM" rel="footnote">5</a></sup></p>
+
+<pre><code>vMAT_Array * matXv = [vMAT_Array arrayWithSize:vMAT_MakeSize(4, 3)
+                                          type:miSINGLE];
+Mat&lt;float&gt; Xv = matXv;
+Xv &lt;&lt;
+  4,   9, 169,
+121, 100,  64,
+ 49,  36, 144,
+196, 225,   1;
+STAssertEqualObjects(matX, matXv, @"Ensure equal arrays");
+</code></pre>
+
+<p>Readers unfamiliar with <strong>Eigen</strong> may be wondering at this point how its templates handle
+matrices whose dimensions are not known at compile-time. The short answer is that <code>Eigen::Dynamic</code>
+may be specified in place of either or both the <code>rows</code> and <code>columns</code> template arguments.
+When the number of rows or columns <em>is</em> known at compile-time, specifying it in the template
+type instantiation results both in more efficient code, and in compile-time and run-time checks
+of the matrix dimensions.</p>
+
+<h3 id="loading-arrays">Loading Arrays</h3>
+
+<p>Specifying array contents in source code as compile-time constants is convenient for small
+matrices, but impractical for larger arrays. <strong>vMAT</strong> provides two basic ways of loading (and saving) arrays:
+raw binary file I/O and the ability to read and write <strong>MATLAB</strong> v5-compatible <code>.mat</code> files. The latter is
+generally preferred, as it preserves array metadata, allows files to be exchanged
+between big-endian and little-endian platforms, etc.</p>
+
+<p>The following snippet loads a single matrix variable from a <code>.mat</code> file bundled with a test case.
+In this instance, the <code>.mat</code> file was produced by <strong>MATLAB</strong>, and the workspace variable <code>"M"</code>
+contains the matrix result of the <strong>MATLAB</strong> command <code>M = magic(4)</code>.</p>
+
+<pre><code>NSURL * URL = [[NSBundle bundleForClass:[self class]] URLForResource:@"test-magic-4x4-v6"
+                                                       withExtension:@"mat"];
+NSError * error = nil;
+NSDictionary * workspace = vMAT_load(URL, @[ @"M" ], &amp;error);
+NSLog(@"workspace = %@", workspace);
+vMAT_Array * matM = [workspace variable:@"M"].matrix;
+STAssertNotNil(matM, @"Failed to load M");
+</code></pre>
+
+<p>The second argument to <code>vMAT_load</code> is an array of workspace variable names; here we’re loading
+only one variable, but more than one can be specified. If the <code>.mat</code> file contains variables that don’t
+match an entry in the array, they are skipped. If the array contains names that don’t match
+any variable in the <code>.mat</code> file, the returned <code>NSDictionary</code> will not contain that name as a <em>key</em>.</p>
+
+<p>Here is what <code>workspace</code> looks like when it’s logged to the console by the above snippet:</p>
+
+<pre><code>2013-04-13 12:05:03.292 otest[8382:303] workspace = {
+    M = "&lt;vMAT_MATv5NumericArray: 0x101801380; mxClass: [6]mxDOUBLE_CLASS, size: [4 4], name: 'M'&gt;";
+}
+</code></pre>
+
+<p>The <code>workspace</code> result normally points to an <code>NSDictionary</code>; the <em>keys</em> are
+the variable names that were matched as described above, and the <em>values</em> are instances
+of the <code>vMAT_MATv5Variable</code> class cluster. For our purposes here, the only salient functionality
+of that cluster is that it has a <code>-matrix</code> accessor method which returns a <code>vMAT_Array</code>.</p>
+
+<p>The <code>error</code> result (customarily ignored above) will normally be <code>nil</code>, but will point to an <code>NSError</code> if there’s
+any problem opening <code>URL</code>, reading from the resulting <code>NSInputStream</code> or parsing the stream’s
+contents. Per the usual conventions, if an error occurs the <code>workspace</code> result may also be <code>nil</code>.</p>
+
+<p>Saving an array (unsurprisingly) requires first marshaling it into a <code>workspace</code> dictionary
+as a <code>vMAT_MATv5Variable</code>, then calling <code>vMAT_save</code>.</p>
+
+<h3 id="the-vmatapi-functions">The vMAT_API Functions</h3>
+
+<p>The most daunting part of porting code developed in <strong>MATLAB</strong> to <strong>Objective-C++</strong> (or to <em>any</em> other language)
+is re-implementing all of those <em>wonderful</em> toolbox functions. If only there were a collection of open-source
+equivalents being assembled somewhere… Well, that’s exactly what <strong>vMAT</strong> hopes to be when it grows up.</p>
+
+<p>Here are a few of the <code>vMAT_API</code> functions available in the pre-1.0
+<a href="https://github.com/kaelin/vMAT/issues?milestone=1&amp;state=closed"><strong>Bootstrap</strong></a> release:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>MATLAB</th>
+      <th>vMAT_API</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>double(X)</code></td>
+      <td><code>vMAT_double(X)</code></td>
+      <td><code>X</code> is <em>coerced</em> to double-precision floating point; if <code>X</code> was not <em>already</em> in that format, this allocates and returns a new matrix.</td>
+    </tr>
+    <tr>
+      <td><code>eye(3)</code></td>
+      <td><code>vMAT_eye(vMAT_MakeSize(3), nil)</code></td>
+      <td>The additional argument, <code>nil</code> here, allows an array type specification.<sup id="fnref:atspec"><a href="#fn:atspec" rel="footnote">6</a></sup></td>
+    </tr>
+    <tr>
+      <td><code>find(Y)</code></td>
+      <td><code>vMAT_find(Y, nil)</code></td>
+      <td><code>Y</code> is <em>coerced</em> to a logical array. See the documentation for supported options.</td>
+    </tr>
+    <tr>
+      <td><code>X'</code></td>
+      <td><code>X.mtrans</code> or <code>vMAT_mtrans(X)</code></td>
+      <td>The functional version is guaranteed not to modify <code>X</code>; the property <em>makes no such guarantee (!) <strong>but may still return a new matrix!</strong></em></td>
+    </tr>
+    <tr>
+      <td><code>pdist(X)</code></td>
+      <td><code>vMAT_pdist(X.mtrans)</code></td>
+      <td>Some <strong>vMAT</strong> functions take arguments transposed from their <strong>MATLAB</strong> equivalents.<sup id="fnref:mtrans"><a href="#fn:mtrans" rel="footnote">7</a></sup></td>
+    </tr>
+    <tr>
+      <td><code>single(X)</code></td>
+      <td><code>vMAT_single(X)</code></td>
+      <td><code>X</code> is <em>coerced</em> to single-precision floating point; if <code>X</code> was not <em>already</em> in that format, this allocates and returns a new matrix.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The table above is meager, yes; but it’s just a small sampling of the growing collection of <code>vMAT_API</code> functions.
+There are more being added all the time. If a function you need isn’t already included in <strong>vMAT</strong>,
+chances are some bits and pieces you could use to write it yourself <em>are</em>; and you can
+choose to contribute your own implementations back to <strong>vMAT</strong> or not. <strong>vMAT</strong> is distributed
+under an <a href="http://opensource.org"><strong>OSI</strong></a>-approved, commercial-developer-friendly
+<a href="http://opensource.org/licenses/BSD-2-Clause"><strong>BSD</strong> 2-Clause License</a>.</p>
+
+<h3 id="getting-started-with-vmat">Getting Started with vMAT</h3>
+
+<p><strong>CocoaPods</strong> is what the cool kids are using these days to manage dependencies for <strong>iOS</strong> and <strong>Mac OS X</strong>
+projects. The easiest way to get started with <strong>vMAT</strong> is to join in the fun.</p>
+
+<p>The minimum <strong>PodFile</strong> for specifying that your <strong>Xcode</strong> project depends on <strong>vMAT</strong> looks like this:</p>
+
+<pre><code>platform :osx, '10.8'
+pod 'vMAT', '~&gt; 0.0.1'
+</code></pre>
+
+<p>There is a <a href="https://github.com/kaelin/vMAT/wiki/FAQ"><strong>vMAT FAQ</strong></a> that covers common installation
+issues and other topics of interest to new users.</p>
+
+<hr />
+<div class="footnotes">
+  <ol>
+    <li id="fn:tm">
+      <p><strong>MATLAB</strong>™® is a registered trademark of <strong><a href="http://www.mathworks.com/products/matlab/">The MathWorks, Inc.</a></strong><a href="#fnref:tm" rel="reference">&#8617;</a></p>
+    </li>
+    <li id="fn:pedagogy">
+      <p>In interests of pedagogy, the code snippets in this document <em>do not</em> (necessarily) represent recommended <strong>vMAT</strong> coding practices. For example, the earliest snippets forego the use of convenience functions that haven’t been introduced yet, and all of the examples ignore potential efficiency concerns when doing so makes the intent of the code more clear.<a href="#fnref:pedagogy" rel="reference">&#8617;</a></p>
+    </li>
+    <li id="fn:dismay">
+      <p>At least <strong>I</strong> found it dismaying, to the point that I initially used the more familiar <em>row-major</em> ordering of <strong>C</strong>; but I soon found I was constantly needing to transpose array data imported from <strong>MATLAB</strong>, and then transpose it again before passing it along to <strong>BLAS</strong> or <strong>LAPACK</strong> routines. The last straw for me was discovering that <strong>Eigen</strong> also expected <em>column-major</em> array storage.<a href="#fnref:dismay" rel="reference">&#8617;</a></p>
+    </li>
+    <li id="fn:dims">
+      <p>Note that the <code>Eigen::Matrix</code> template instantiation requires you to specify the matrix dimensions, while the <code>vMAT::Mat</code> template defaults the <code>rows</code> and <code>columns</code> parameters to <code>Eigen::Dynamic</code>.<a href="#fnref:dims" rel="reference">&#8617;</a></p>
+    </li>
+    <li id="fn:iniM">
+      <p>Note that, unlike the first example snippet, the matrix now appears in the <strong>Objective-C++</strong> source code in the same order (<em>column-major</em>) that it appears in the log output. For reasons which I hope are obvious, this is the preferred way to initialize matrices from source constants.<a href="#fnref:iniM" rel="reference">&#8617;</a></p>
+    </li>
+    <li id="fn:atspec">
+      <p>Actually <strong>MATLAB</strong> <em>also</em> accepts an array type specification; but <strong>MATLAB</strong> allows for more dynamic argument handling than <strong>Objective-C</strong> does. <strong>vMAT</strong>’s compromise usually involves marshalling optional arguments into an <code>NSArray</code>;  when no options are desired, <code>nil</code> can take the place of the empty array.<a href="#fnref:atspec" rel="reference">&#8617;</a></p>
+    </li>
+    <li id="fn:mtrans">
+      <p>Sometimes this is done to optimize for vectorization; specifically to be able to call <strong>vDSP</strong> functions with unit strides. And sometimes it’s done because the <strong>vMAT</strong> function usually used to prepare the input matrix produces output transposed from <em>its</em> <strong>MATLAB</strong> equivalent. And sometimes it’s an expression of personal preference on the part of your humble author; but not usually.<a href="#fnref:mtrans" rel="reference">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Kaelin Colclasure</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-13T00:00:00-07:00" pubdate data-updated="true">Apr 13<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/posts/'>posts</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://kaelin.github.io/blog/2013/04/13/the-vmat-manifesto/" data-via="KColclasure" data-counturl="http://kaelin.github.io/blog/2013/04/13/the-vmat-manifesto/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/04/25/generating-code-with-a-ruby-dsl/" title="Next Post: Generating Objective-C code with a ruby DSL">Generating Objective-C code with a ruby DSL &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/04/25/generating-code-with-a-ruby-dsl/">Generating Objective-C code with a ruby DSL</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/13/the-vmat-manifesto/">The vMAT Manifesto</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/kaelin">@kaelin</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'kaelin',
+            count: 5,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/109369514751343838918?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Kaelin Colclasure -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'kaelin-gh-pages';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,336 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Generating Objective-C code with a ruby DSL - kaelin</title>
+  <meta name="author" content="Kaelin Colclasure">
+
+  
+  <meta name="description" content="vMAT uses a ruby DSL to do code generation for certain repetitive code patterns. For example, the way coercions between matrices of different types &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://kaelin.github.io/blog/2013/04/25/generating-code-with-a-ruby-dsl">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="kaelin" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-39966900-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">kaelin</a></h1>
+  
+    <h2>Projects, code, tutorials, opinions and other random bits</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:kaelin.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Generating Objective-C Code With a Ruby DSL</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-25T00:00:00-07:00" pubdate data-updated="true">Apr 25<span>th</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><strong>vMAT</strong> uses a <strong>ruby</strong> DSL to do code generation for certain repetitive code patterns. For example, the way coercions between matrices of different types is handled (dynamically, at runtime<sup id="fnref:kthx"><a href="#fn:kthx" rel="footnote">1</a></sup>) currently requires implementing an <strong>Objective-C++</strong> <em>dispatch</em> method to copy <em>to</em> every numeric type <em>from</em> every numeric type. With 10 distinct numeric types that is 100 <strong>Objective-C++</strong> methods that are <em>slight</em> variations of the same method template.</p>
+
+<p>This is the problem that <strong>vMATCodeMonkey</strong> was designed to solve. <!-- more -->Given the following specification in the file <code>copyFromMethods.mk</code><sup id="fnref:exts"><a href="#fn:exts" rel="footnote">2</a></sup>:</p>
+
+<div><script src="https://gist.github.com/5474962.js"></script>
+<noscript><pre><code /></pre></noscript></div>
+
+<p><strong>vMATCodeMonkey</strong> produces 100 methods are all slight variations on this one:</p>
+
+<div><script src="https://gist.github.com/5474979.js"></script>
+<noscript><pre><code /></pre></noscript></div>
+
+<p>“That’s not very Impressive”, I hear you saying. Okay, let’s look at a more complex (but still highly repetitive) coding task: Parsing all those <code>vMAT_API</code> function’s <code>options</code> arrays.</p>
+
+<p>Given this specification from <code>clusterOptions.mk</code>:</p>
+
+<div><script src="https://gist.github.com/5475036.js"></script>
+<noscript><pre><code /></pre></noscript></div>
+
+<p><strong>vMATCodeMonkey</strong> produces the following code:</p>
+
+<div><script src="https://gist.github.com/5475028.js"></script>
+<noscript><pre><code /></pre></noscript></div>
+
+<p>As you can see, in this case the DSL specification looks nothing at all like the generated <strong>Objective-C</strong> code.</p>
+
+<p>Both of these examples essentially entail boilerplate code. And it’s the <em>kind</em> of boilerplate that tends to get programmers in trouble; it’s clearly crying out for abstraction, but what <em>kind</em> of abstraction?</p>
+
+<p>In a germinal version of <strong>vMAT</strong> (from even before embracing <strong>Objective-C++</strong>) I used the following idiom to implement the very first of the dispatch methods from the first example:</p>
+
+<div><script src="https://gist.github.com/5475264.js"></script>
+<noscript><pre><code /></pre></noscript></div>
+
+<p>Clearly, this was disaster waiting to happen. Even with those <em>ugly</em> macros each copy &amp; paste instantiation of this “template” needed to be carefully edited in <em>four</em> places. Unsurprisingly, it was exactly this exercise that pushed me over the barrier and into the realm of <strong>Objective-C++</strong>. But how much did templates really improve things?</p>
+
+<p>Well, only by half, obviously. <strong>C++</strong> allowed me to create the overloaded <code>copyFrom</code> function that is still used in the generated code. But there was still no way to template-ize those <strong>Objective-C</strong> selectors. And that’s where the first incarnation of <strong>vMATCodeMonkey</strong> entered the scene.</p>
+
+<div><script src="https://gist.github.com/5475290.js"></script>
+<noscript><pre><code /></pre></noscript></div>
+
+<p>Not a DSL at all; just a quick <strong>ruby</strong> script to complete what would otherwise be an annoying and error-prone task.<sup id="fnref:hacks"><a href="#fn:hacks" rel="footnote">3</a></sup> But once you set foot down this path, it’s hard to stop.</p>
+
+<p>In a (perhaps distant) future post, I’ll walk through a dissection of the current implementation of <a href="https://github.com/kaelin/vMAT/blob/master/ruby/vMATCodeMonkey.rb"><strong>vMATCodeMonkey</strong></a>. Not that I think it’s a model implementation or anything, mind you. I’ve only been writing <strong>ruby</strong> code for a short time, and I certainly could not have completed this task without lots of assistance from the <strong>ruby</strong> community of <a href="http://stackoverflow.com/questions/tagged/ruby">StackOverflow</a>. But I believe it’s a testament to the versatility of the language that <em>even I, as a relative n00bie @ <strong>ruby</strong></em> was able to make this useful-if-highly-specialized tool. [Not that there weren’t a few speed bumps along the way. I’ll talk about those too.]</p>
+
+<hr />
+<div class="footnotes">
+  <ol>
+    <li id="fn:kthx">
+      <p>While <strong>C++</strong> templates are a useful tool for handling repetitive code generation at <em>compile-time</em>, they can’t solve this particular <strong>vMAT</strong> challenge; there’s no notion of method overloading in <strong>Objective-C</strong>.<a href="#fnref:kthx" rel="reference">&#8617;</a></p>
+    </li>
+    <li id="fn:exts">
+      <p>The extensions of the filenames of <strong>gists</strong> included in this article differ from the names used in <strong>vMAT</strong>’s code base. This was done to get more appropriate syntax highlighting.<a href="#fnref:exts" rel="reference">&#8617;</a></p>
+    </li>
+    <li id="fn:hacks">
+      <p>I’d bet that’s how a lot of <strong>ruby</strong> DSLs got their start.<a href="#fnref:hacks" rel="reference">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Kaelin Colclasure</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-25T00:00:00-07:00" pubdate data-updated="true">Apr 25<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/posts/'>posts</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://kaelin.github.io/blog/2013/04/25/generating-code-with-a-ruby-dsl/" data-via="KColclasure" data-counturl="http://kaelin.github.io/blog/2013/04/25/generating-code-with-a-ruby-dsl/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/04/13/the-vmat-manifesto/" title="Previous Post: The vMAT Manifesto">&laquo; The vMAT Manifesto</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/04/25/generating-code-with-a-ruby-dsl/">Generating Objective-C code with a ruby DSL</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/13/the-vmat-manifesto/">The vMAT Manifesto</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/kaelin">@kaelin</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'kaelin',
+            count: 5,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/109369514751343838918?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Kaelin Colclasure -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'kaelin-gh-pages';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
