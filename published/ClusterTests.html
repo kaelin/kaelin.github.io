@@ -1,0 +1,196 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>ClusterTests</title><meta name="generator" content="MATLAB 8.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-04-28"><meta name="DC.source" content="ClusterTests.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>ClusterTests</h1><!--introduction--><p>This <b>MATLAB</b> script is used to generate data for testing the various <b>vMAT</b> functions used for clustering observations.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Input Test Data</a></li><li><a href="#2">pdist and linkage</a></li><li><a href="#3">inconsistent</a></li><li><a href="#4">cluster</a></li><li><a href="#5">cluster-normaldata-10x3-13.mat</a></li></ul></div><h2>Input Test Data<a name="1"></a></h2><p>First off, we need some data to play with. Since we don't have anything more interesting at hand for the moment, let's start with a repeatable random sample from a normal distribution.</p><pre class="codeinput">X = gallery(<span class="string">'normaldata'</span>, [10 3], 13, <span class="string">'double'</span>);
+cmap = gray; cmap(:, 1:3) = .95;
+makeHtmlTable(X, [], seqlabels(<span class="string">'obs'</span>, 10), seqlabels(<span class="string">'x'</span>, 3), cmap, 4);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td></td><td>x1</td><td>x2</td><td>x3</td></tr>
+<tr><td>obs1</td><td style="background:#F2F2F2">1.203</td><td style="background:#F2F2F2">0.06809</td><td style="background:#F2F2F2">-0.5938</td></tr>
+<tr><td>obs2</td><td style="background:#F2F2F2">0.6676</td><td style="background:#F2F2F2">-0.3744</td><td style="background:#F2F2F2">0.2813</td></tr>
+<tr><td>obs3</td><td style="background:#F2F2F2">1.737</td><td style="background:#F2F2F2">1.532</td><td style="background:#F2F2F2">-1.225</td></tr>
+<tr><td>obs4</td><td style="background:#F2F2F2">-0.474</td><td style="background:#F2F2F2">-0.1009</td><td style="background:#F2F2F2">0.02343</td></tr>
+<tr><td>obs5</td><td style="background:#F2F2F2">1.677</td><td style="background:#F2F2F2">-0.7548</td><td style="background:#F2F2F2">0.8096</td></tr>
+<tr><td>obs6</td><td style="background:#F2F2F2">-1.28</td><td style="background:#F2F2F2">-0.6805</td><td style="background:#F2F2F2">-0.009285</td></tr>
+<tr><td>obs7</td><td style="background:#F2F2F2">-0.9427</td><td style="background:#F2F2F2">1.165</td><td style="background:#F2F2F2">-0.7701</td></tr>
+<tr><td>obs8</td><td style="background:#F2F2F2">0.2707</td><td style="background:#F2F2F2">1.155</td><td style="background:#F2F2F2">0.4899</td></tr>
+<tr><td>obs9</td><td style="background:#F2F2F2">-1.429</td><td style="background:#F2F2F2">0.7309</td><td style="background:#F2F2F2">-2.161</td></tr>
+<tr><td>obs10</td><td style="background:#F2F2F2">-0.5094</td><td style="background:#F2F2F2">1.479</td><td style="background:#F2F2F2">0.406</td></tr>
+</table><br><h2>pdist and linkage<a name="2"></a></h2><p>Now we can compute the pairwise-distances between observations (<tt>pdist</tt>) and then the hierarchical cluster tree (<tt>linkage</tt>). The <tt>dendrogram</tt> plot provides a nice visual summary of the hierarchical cluster tree. (It's only here for informational purposes, as <b>vMAT</b> doesn't have any plotting functions.)</p><p><b>NOTE:</b> Don't forget, <tt>vMAT_pdist</tt> wants <tt>X'</tt>, and <tt>vMAT_linkage</tt> has zero-based indexes in the first two columns. The data in the <b>MAT</b> file includes the variable <tt>Zv</tt> for validating the test results.</p><pre class="codeinput">Y = pdist(X);
+Z = linkage(Y);
+Zv = [Z(:,1:2)-1 Z(:,3)];
+makeHtmlTable(Zv,[], <span class="keyword">...</span>
+    seqlabels(<span class="string">'link'</span>, length(Zv)), {<span class="string">'idx1'</span>, <span class="string">'idx2'</span>, <span class="string">'distance'</span>}, cmap, 4);
+dendrogram(Z);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td></td><td>idx1</td><td>idx2</td><td>distance</td></tr>
+<tr><td>link1</td><td style="background:#F2F2F2">7</td><td style="background:#F2F2F2">9</td><td style="background:#F2F2F2">0.8487</td></tr>
+<tr><td>link2</td><td style="background:#F2F2F2">3</td><td style="background:#F2F2F2">5</td><td style="background:#F2F2F2">0.9934</td></tr>
+<tr><td>link3</td><td style="background:#F2F2F2">0</td><td style="background:#F2F2F2">1</td><td style="background:#F2F2F2">1.117</td></tr>
+<tr><td>link4</td><td style="background:#F2F2F2">4</td><td style="background:#F2F2F2">12</td><td style="background:#F2F2F2">1.201</td></tr>
+<tr><td>link5</td><td style="background:#F2F2F2">11</td><td style="background:#F2F2F2">13</td><td style="background:#F2F2F2">1.202</td></tr>
+<tr><td>link6</td><td style="background:#F2F2F2">6</td><td style="background:#F2F2F2">10</td><td style="background:#F2F2F2">1.292</td></tr>
+<tr><td>link7</td><td style="background:#F2F2F2">14</td><td style="background:#F2F2F2">15</td><td style="background:#F2F2F2">1.533</td></tr>
+<tr><td>link8</td><td style="background:#F2F2F2">8</td><td style="background:#F2F2F2">16</td><td style="background:#F2F2F2">1.536</td></tr>
+<tr><td>link9</td><td style="background:#F2F2F2">2</td><td style="background:#F2F2F2">17</td><td style="background:#F2F2F2">1.681</td></tr>
+</table><br><img vspace="5" hspace="5" src="ClusterTests_01.png" alt=""> <h2>inconsistent<a name="3"></a></h2><p>Two methods of clustering are supported in <b>vMAT</b> (for now): <tt>'cutoff:'</tt> uses an inconsistency coefficient to produce an arbitrary number of clusters, and <tt>'maxclust:'</tt> returns <i>at most</i> a specified number of clusters. [The <b>MATLAB</b> <tt>cluster</tt> function of course has a number of additional options, but these are two commonly useful ones.]</p><p>When you're actually <i>using</i> <tt>vMAT_cluster</tt> it's not necessary to call the <tt>vMAT_inconsistent</tt> function explicitly; it's called from <tt>vMAT_cluster</tt> as necessary. But for the purpose of testing, we're going to call it so we can validate that <b>vMAT</b>'s function matches the output of <b>MATLAB</b>'s. (If the two implementations are inconsistent [sic], the clustering is likely to come out differently as well.) The inconsistency coefficient is explained in the documentation for the <tt>inconsistent</tt> function.</p><pre class="codeinput">Wv = inconsistent(Z);
+ZW = [Zv Wv];
+makeHtmlTable(ZW, [], <span class="keyword">...</span>
+    seqlabels(<span class="string">'link'</span>, length(Z)), <span class="keyword">...</span>
+    {<span class="string">'idx1'</span>, <span class="string">'idx2'</span>, <span class="string">'distance'</span>, <span class="string">'mean'</span>, <span class="string">'std'</span>, <span class="string">'n'</span>, <span class="string">'coefficient'</span>}, cmap, 4);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td></td><td>idx1</td><td>idx2</td><td>distance</td><td>mean</td><td>std</td><td>n</td><td>coefficient</td></tr>
+<tr><td>link1</td><td style="background:#F2F2F2">7</td><td style="background:#F2F2F2">9</td><td style="background:#F2F2F2">0.8487</td><td style="background:#F2F2F2">0.8487</td><td style="background:#F2F2F2">0</td><td style="background:#F2F2F2">1</td><td style="background:#F2F2F2">0</td></tr>
+<tr><td>link2</td><td style="background:#F2F2F2">3</td><td style="background:#F2F2F2">5</td><td style="background:#F2F2F2">0.9934</td><td style="background:#F2F2F2">0.9934</td><td style="background:#F2F2F2">0</td><td style="background:#F2F2F2">1</td><td style="background:#F2F2F2">0</td></tr>
+<tr><td>link3</td><td style="background:#F2F2F2">0</td><td style="background:#F2F2F2">1</td><td style="background:#F2F2F2">1.117</td><td style="background:#F2F2F2">1.117</td><td style="background:#F2F2F2">0</td><td style="background:#F2F2F2">1</td><td style="background:#F2F2F2">0</td></tr>
+<tr><td>link4</td><td style="background:#F2F2F2">4</td><td style="background:#F2F2F2">12</td><td style="background:#F2F2F2">1.201</td><td style="background:#F2F2F2">1.159</td><td style="background:#F2F2F2">0.05934</td><td style="background:#F2F2F2">2</td><td style="background:#F2F2F2">0.7071</td></tr>
+<tr><td>link5</td><td style="background:#F2F2F2">11</td><td style="background:#F2F2F2">13</td><td style="background:#F2F2F2">1.202</td><td style="background:#F2F2F2">1.132</td><td style="background:#F2F2F2">0.1202</td><td style="background:#F2F2F2">3</td><td style="background:#F2F2F2">0.58</td></tr>
+<tr><td>link6</td><td style="background:#F2F2F2">6</td><td style="background:#F2F2F2">10</td><td style="background:#F2F2F2">1.292</td><td style="background:#F2F2F2">1.07</td><td style="background:#F2F2F2">0.3135</td><td style="background:#F2F2F2">2</td><td style="background:#F2F2F2">0.7071</td></tr>
+<tr><td>link7</td><td style="background:#F2F2F2">14</td><td style="background:#F2F2F2">15</td><td style="background:#F2F2F2">1.533</td><td style="background:#F2F2F2">1.342</td><td style="background:#F2F2F2">0.1711</td><td style="background:#F2F2F2">3</td><td style="background:#F2F2F2">1.114</td></tr>
+<tr><td>link8</td><td style="background:#F2F2F2">8</td><td style="background:#F2F2F2">16</td><td style="background:#F2F2F2">1.536</td><td style="background:#F2F2F2">1.534</td><td style="background:#F2F2F2">0.002258</td><td style="background:#F2F2F2">2</td><td style="background:#F2F2F2">0.7071</td></tr>
+<tr><td>link9</td><td style="background:#F2F2F2">2</td><td style="background:#F2F2F2">17</td><td style="background:#F2F2F2">1.681</td><td style="background:#F2F2F2">1.609</td><td style="background:#F2F2F2">0.1026</td><td style="background:#F2F2F2">2</td><td style="background:#F2F2F2">0.7071</td></tr>
+</table><br><h2>cluster<a name="4"></a></h2><p>Now, <i>finally</i> we're ready to see how the data clusters.</p><pre class="codeinput">VCv = cluster(Z, <span class="string">'cutoff'</span>, [.5 .75]) - 1;
+VMv = cluster(Z, <span class="string">'maxclust'</span>, [3 4]) - 1;
+Summary = [VCv VMv];
+makeHtmlTable(Summary, [], <span class="keyword">...</span>
+    seqlabels(<span class="string">'obs'</span>, length(Z) + 1), {<span class="string">'cutoff: 0.5'</span>, <span class="string">'cutoff: 0.75'</span>, <span class="string">'maxclust: 3'</span>, <span class="string">'maxclust: 4'</span>}, cmap, 4);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td></td><td>cutoff: 0.5</td><td>cutoff: 0.75</td><td>maxclust: 3</td><td>maxclust: 4</td></tr>
+<tr><td>obs1</td><td style="background:#F2F2F2">5</td><td style="background:#F2F2F2">0</td><td style="background:#F2F2F2">1</td><td style="background:#F2F2F2">0</td></tr>
+<tr><td>obs2</td><td style="background:#F2F2F2">5</td><td style="background:#F2F2F2">0</td><td style="background:#F2F2F2">1</td><td style="background:#F2F2F2">0</td></tr>
+<tr><td>obs3</td><td style="background:#F2F2F2">4</td><td style="background:#F2F2F2">2</td><td style="background:#F2F2F2">2</td><td style="background:#F2F2F2">3</td></tr>
+<tr><td>obs4</td><td style="background:#F2F2F2">1</td><td style="background:#F2F2F2">0</td><td style="background:#F2F2F2">1</td><td style="background:#F2F2F2">0</td></tr>
+<tr><td>obs5</td><td style="background:#F2F2F2">0</td><td style="background:#F2F2F2">0</td><td style="background:#F2F2F2">1</td><td style="background:#F2F2F2">0</td></tr>
+<tr><td>obs6</td><td style="background:#F2F2F2">1</td><td style="background:#F2F2F2">0</td><td style="background:#F2F2F2">1</td><td style="background:#F2F2F2">0</td></tr>
+<tr><td>obs7</td><td style="background:#F2F2F2">2</td><td style="background:#F2F2F2">3</td><td style="background:#F2F2F2">1</td><td style="background:#F2F2F2">1</td></tr>
+<tr><td>obs8</td><td style="background:#F2F2F2">6</td><td style="background:#F2F2F2">3</td><td style="background:#F2F2F2">1</td><td style="background:#F2F2F2">1</td></tr>
+<tr><td>obs9</td><td style="background:#F2F2F2">3</td><td style="background:#F2F2F2">1</td><td style="background:#F2F2F2">0</td><td style="background:#F2F2F2">2</td></tr>
+<tr><td>obs10</td><td style="background:#F2F2F2">6</td><td style="background:#F2F2F2">3</td><td style="background:#F2F2F2">1</td><td style="background:#F2F2F2">1</td></tr>
+</table><br><h2>cluster-normaldata-10x3-13.mat<a name="5"></a></h2><p>Save the data in a <b>MAT</b> file, so it can be loaded by the unit test cases.</p><pre class="codeinput">save(<span class="string">'cluster-normaldata-10x3-13'</span>, <span class="string">'-v6'</span>, <span class="keyword">...</span>
+    <span class="string">'X'</span>, <span class="string">'Zv'</span>, <span class="string">'Wv'</span>, <span class="string">'VCv'</span>, <span class="string">'VMv'</span>);
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2013a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% ClusterTests
+% This *MATLAB* script is used to generate data for testing the various *vMAT*
+% functions used for clustering observations.
+%% Input Test Data
+% First off, we need some data to play with. Since we don't have anything
+% more interesting at hand for the moment, let's start with a repeatable 
+% random sample from a normal distribution.
+X = gallery('normaldata', [10 3], 13, 'double');
+cmap = gray; cmap(:, 1:3) = .95;
+makeHtmlTable(X, [], seqlabels('obs', 10), seqlabels('x', 3), cmap, 4);
+%% pdist and linkage
+% Now we can compute the pairwise-distances between observations (|pdist|) and then the
+% hierarchical cluster tree (|linkage|). The |dendrogram| plot provides a
+% nice visual summary of the hierarchical cluster tree. (It's only here for
+% informational purposes, as *vMAT* doesn't have any plotting functions.)
+% 
+% *NOTE:* Don't forget, |vMAT_pdist| wants |X'|, and |vMAT_linkage| has
+% zero-based indexes in the first two columns. The data in the *MAT* file
+% includes the variable |Zv| for validating the test results.
+Y = pdist(X);
+Z = linkage(Y);
+Zv = [Z(:,1:2)-1 Z(:,3)];
+makeHtmlTable(Zv,[], ...
+    seqlabels('link', length(Zv)), {'idx1', 'idx2', 'distance'}, cmap, 4);
+dendrogram(Z);
+%% inconsistent
+% Two methods of clustering are supported in *vMAT* (for now): |'cutoff:'| uses an
+% inconsistency coefficient to produce an arbitrary number of clusters, and
+% |'maxclust:'| returns _at most_ a specified number of clusters.
+% [The *MATLAB* |cluster| function of course has a number of additional
+% options, but these are two commonly useful ones.]
+%
+% When you're actually _using_ |vMAT_cluster| it's not necessary to call
+% the |vMAT_inconsistent| function explicitly; it's called from
+% |vMAT_cluster| as necessary. But for the purpose of testing, we're going
+% to call it so we can validate that *vMAT*'s function matches the output
+% of *MATLAB*'s. (If the two implementations are inconsistent [sic], the
+% clustering is likely to come out differently as well.)
+% The inconsistency coefficient is explained in the documentation
+% for the |inconsistent| function.
+Wv = inconsistent(Z);
+ZW = [Zv Wv];
+makeHtmlTable(ZW, [], ...
+    seqlabels('link', length(Z)), ...
+    {'idx1', 'idx2', 'distance', 'mean', 'std', 'n', 'coefficient'}, cmap, 4);
+%% cluster
+% Now, _finally_ we're ready to see how the data clusters.
+VCv = cluster(Z, 'cutoff', [.5 .75]) - 1;
+VMv = cluster(Z, 'maxclust', [3 4]) - 1;
+Summary = [VCv VMv];
+makeHtmlTable(Summary, [], ...
+    seqlabels('obs', length(Z) + 1), {'cutoff: 0.5', 'cutoff: 0.75', 'maxclust: 3', 'maxclust: 4'}, cmap, 4);
+%% cluster-normaldata-10x3-13.mat
+% Save the data in a *MAT* file, so it can be loaded by the unit test
+% cases.
+save('cluster-normaldata-10x3-13', '-v6', ...
+    'X', 'Zv', 'Wv', 'VCv', 'VMv');
+
+##### SOURCE END #####
+--></body></html>
