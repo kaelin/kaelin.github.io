@@ -156,7 +156,10 @@ makeHtmlTable(Summary, [], <span class="keyword">...</span>
 <tr><td>obs10</td><td style="background:#F2F2F2">6</td><td style="background:#F2F2F2">3</td><td style="background:#F2F2F2">1</td><td style="background:#F2F2F2">1</td></tr>
 </table><br><h2>cluster-normaldata-10x3-13.mat<a name="5"></a></h2><p>Save the data in a <b>MAT</b> file, so it can be loaded by the unit test cases.</p><pre class="codeinput">save(<span class="string">'cluster-normaldata-10x3-13'</span>, <span class="string">'-v6'</span>, <span class="keyword">...</span>
     <span class="string">'X'</span>, <span class="string">'Zv'</span>, <span class="string">'Wv'</span>, <span class="string">'VCv'</span>, <span class="string">'VMv'</span>);
-</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2013a</a><br></p></div><!--
+attach(<span class="string">'cluster-normaldata-10x3-13.mat'</span>);
+</pre><table border="1" cellpadding="4" cellspacing="0">
+<tr><td><a href="cluster-normaldata-10x3-13.mat">cluster-normaldata-10x3-13.mat</a></td></tr>
+</table><br><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2013a</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% ClusterTests
 % This *MATLAB* script is used to generate data for testing the various *vMAT*
@@ -215,6 +218,7 @@ makeHtmlTable(Summary, [], ...
 % cases.
 save('cluster-normaldata-10x3-13', '-v6', ...
     'X', 'Zv', 'Wv', 'VCv', 'VMv');
+attach('cluster-normaldata-10x3-13.mat');
 
 ##### SOURCE END #####
 -->
@@ -303,13 +307,11 @@ save('cluster-normaldata-10x3-13', '-v6', ...
 
 
 
-<section>
-  <h1>On Twitter:</h1>
-  <div>
-    <p><br /><a href="http://twitter.com/KColclasure" target="_blank">My Tweets, on Twitter.</a></p>
-    <a href="http://twitter.com/KColclasure" class="twitter-follow-button" data-show-count="">Follow @KColclasure</a>
-  </div>
-</section>
+<h2>twitter</h2>
+<a href="https://twitter.com/KColclasure" class="twitter-follow-button" data-show-count="true" data-lang="en">Follow @KColclasure</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+<div class="tweet" data-twitter-user="KColclasure">
+</div>
 
 
   
