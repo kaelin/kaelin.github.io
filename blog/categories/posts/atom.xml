@@ -4,7 +4,7 @@
   <title><![CDATA[Category: posts | kaelin]]></title>
   <link href="http://kaelin.github.io/blog/categories/posts/atom.xml" rel="self"/>
   <link href="http://kaelin.github.io/"/>
-  <updated>2013-05-04T19:22:08-07:00</updated>
+  <updated>2013-05-04T20:22:00-07:00</updated>
   <id>http://kaelin.github.io/</id>
   <author>
     <name><![CDATA[Kaelin Colclasure]]></name>
@@ -22,29 +22,151 @@
 
 <p>This is the problem that <strong>vMATCodeMonkey</strong> was designed to solve. <!-- more -->Given the following specification in the file <code>copyFromMethods.mk</code><sup id="fnref:exts"><a href="#fn:exts" rel="footnote">2</a></sup>:</p>
 
-<p><div><script src='https://gist.github.com/5474962.js'></script>
-<noscript><pre><code></code></pre></noscript></div>
-</p>
+<p>```ruby
+#  copyFromMethods.mk
+#  vMAT
+#
+#  Created by Kaelin Colclasure on 4/23/13.
+#  Copyright (c) 2013 Kaelin Colclasure. All rights reserved.</p>
+
+<p>require ‘vMATCodeMonkey’</p>
+
+<p>VMATCodeMonkey.new.coercions do |to, fm, to_t, fm_t| «“EOS”
+- (void)<em>copy</em>#{to}<em>from</em>#{fm}:(vMAT_Array *)matrix;
+{
+    copyFrom(self, matrix, #{to_t}, #{fm_t});
+}
+EOS
+end
+```</p>
 
 <p><strong>vMATCodeMonkey</strong> produces 100 methods are all slight variations on this one:</p>
 
-<p><div><script src='https://gist.github.com/5474979.js'></script>
-<noscript><pre><code></code></pre></noscript></div>
-</p>
+<p>```objc
+⋮</p>
+
+<ul>
+  <li>(void)_copy_miDOUBLE_from_miSINGLE:(vMAT_Array *)matrix;
+{
+  copyFrom(self, matrix, DOUBLE, SINGLE);
+}</li>
+</ul>
+
+<p>⋮
+```</p>
 
 <p>“That’s not very Impressive”, I hear you saying. Okay, let’s look at a more complex (but still highly repetitive) coding task: Parsing all those <code>vMAT_API</code> function’s <code>options</code> arrays.</p>
 
 <p>Given this specification from <code>clusterOptions.mk</code>:</p>
 
-<p><div><script src='https://gist.github.com/5475036.js'></script>
-<noscript><pre><code></code></pre></noscript></div>
-</p>
+<p>```ruby
+#  clusterOptions.mk
+#  vMAT
+#
+#  Created by Kaelin Colclasure on 4/26/13.
+#  Copyright (c) 2013 Kaelin Colclasure. All rights reserved.</p>
+
+<p>require ‘vMATCodeMonkey’</p>
+
+<p>VMATCodeMonkey.new.options_processor «EOS, :static
+“criterion:”  arg: { choice =&gt; { “distance” =&gt; set(:useInconsistent, false), “inconsistent” =&gt; set(:useInconsistent, true) }}, default: “inconsistent”
+“cutoff:”     flag: set(:useCutoff, true), arg: vector(:double)
+“depth:”      flag: set(:useInconsistent, true), arg: scalar(:index), default: 2
+“maxclust:”   flag: set(:useCutoff, false), arg: vector(:index)
+EOS
+```</p>
 
 <p><strong>vMATCodeMonkey</strong> produces the following code:</p>
 
-<p><div><script src='https://gist.github.com/5475028.js'></script>
-<noscript><pre><code></code></pre></noscript></div>
-</p>
+<p>```objc
+// vMATCodeMonkey’s work; do not edit by hand!</p>
+
+<p>struct clusterOptions {
+    NSMutableArray * remainingOptions;
+    bool useInconsistent;
+    bool useCutoff;
+    NSString * criterion;
+    vMAT_Array * cutoff;
+    vMAT_Array * depth;
+    vMAT_Array * maxclust;
+};</p>
+
+<h1 id="define-withclusteroptionsoptions-opts-struct-clusteroptions-opts-clusteroptionsoptions-opts">define WITH_clusterOptions(options, opts) struct clusterOptions opts; clusterOptions(options, &amp;opts)</h1>
+
+<p>static void
+clusterOptions(NSArray * options, struct clusterOptions * resultsOut)
+{
+    // “criterion:”  arg: { choice =&gt; { “distance” =&gt; set(:useInconsistent, false), “inconsistent” =&gt; set(:useInconsistent, true) }}, default: “inconsistent”
+    // “cutoff:”     flag: set(:useCutoff, true), arg: vector(:double)
+    // “depth:”      flag: set(:useInconsistent, true), arg: scalar(:index), default: 2
+    // “maxclust:”   flag: set(:useCutoff, false), arg: vector(:index)
+    // Initialize resultsOut struct
+    resultsOut-&gt;remainingOptions = nil;
+    resultsOut-&gt;criterion = @”inconsistent”;
+    resultsOut-&gt;cutoff = nil;
+    resultsOut-&gt;depth = vMAT_coerce(@2, @[ @”index” ]);
+    resultsOut-&gt;maxclust = nil;
+    // Flags: [:useInconsistent, :useCutoff]
+    bool useInconsistent_wasSet = false;
+    resultsOut-&gt;useInconsistent = true;
+    bool useCutoff_wasSet = false;
+    resultsOut-&gt;useCutoff = false;
+    // Locals
+    __block NSMutableArray * remainingOptions = nil;
+    __block NSUInteger optidx = NSNotFound;
+    id (^ optarg)() = ^ { NSCParameterAssert([remainingOptions count] &gt; optidx + 1); return remainingOptions[optidx + 1]; };
+    // Options array normalization
+    if ([options count] &gt; 0) {
+        remainingOptions = [options mutableCopy];
+        resultsOut-&gt;remainingOptions = remainingOptions;
+        options = nil;
+    }
+    else return;
+    // criterion: {:arg=&gt;{:choice_ie1=&gt;{“distance”=&gt;{:set_ie1=&gt;[:useInconsistent, false]}, “inconsistent”=&gt;{:set_ie2=&gt;[:useInconsistent, true]}}, :key=&gt;:choice_ie1, :slot=&gt;”criterion”, :kind=&gt;:choice_with_flags}, :default=&gt;”inconsistent”}
+    if ((optidx = [remainingOptions indexOfObject:@”criterion:”]) != NSNotFound) {
+        {
+            NSMutableArray * remainingOptions = [@[ optarg(), optarg() ] mutableCopy];
+            NSUInteger optidx = NSNotFound;
+            if ((optidx = [remainingOptions indexOfObject:@”distance”]) != NSNotFound) {
+                if (useInconsistent_wasSet) NSCParameterAssert(false == resultsOut-&gt;useInconsistent);
+                else { resultsOut-&gt;useInconsistent = false; useInconsistent_wasSet = true; }
+                resultsOut-&gt;criterion = [optarg() description];
+                [remainingOptions removeObjectsInRange:NSMakeRange(optidx, 2)];
+            }
+            if ((optidx = [remainingOptions indexOfObject:@”inconsistent”]) != NSNotFound) {
+                if (useInconsistent_wasSet) NSCParameterAssert(true == resultsOut-&gt;useInconsistent);
+                else { resultsOut-&gt;useInconsistent = true; useInconsistent_wasSet = true; }
+                resultsOut-&gt;criterion = [optarg() description];
+                [remainingOptions removeObjectsInRange:NSMakeRange(optidx, 2)];
+            }
+        }
+        [remainingOptions removeObjectsInRange:NSMakeRange(optidx, 2)];
+        // Default inconsistent
+    }
+    // cutoff: {:flag=&gt;{:set_ie3=&gt;[:useCutoff, true]}, :arg=&gt;{:vector_ie1=&gt;:double, :type=&gt;:double, :key=&gt;:vector_ie1, :slot=&gt;”cutoff”, :kind=&gt;:scalar_or_vector}}
+    if ((optidx = [remainingOptions indexOfObject:@”cutoff:”]) != NSNotFound) {
+        if (useCutoff_wasSet) NSCParameterAssert(true == resultsOut-&gt;useCutoff);
+        else { resultsOut-&gt;useCutoff = true; useCutoff_wasSet = true; }
+        resultsOut-&gt;cutoff = vMAT_coerce(optarg(), @[ @”double” ]);
+        [remainingOptions removeObjectsInRange:NSMakeRange(optidx, 2)];
+    }
+    // depth: {:flag=&gt;{:set_ie4=&gt;[:useInconsistent, true]}, :arg=&gt;{:scalar_ie1=&gt;:index, :type=&gt;:index, :key=&gt;:scalar_ie1, :slot=&gt;”depth”, :kind=&gt;:scalar_or_vector}, :default=&gt;2}
+    if ((optidx = [remainingOptions indexOfObject:@”depth:”]) != NSNotFound) {
+        if (useInconsistent_wasSet) NSCParameterAssert(true == resultsOut-&gt;useInconsistent);
+        else { resultsOut-&gt;useInconsistent = true; useInconsistent_wasSet = true; }
+        resultsOut-&gt;depth = vMAT_coerce(optarg(), @[ @”index” ]);
+        [remainingOptions removeObjectsInRange:NSMakeRange(optidx, 2)];
+        // Default 2
+    }
+    // maxclust: {:flag=&gt;{:set_ie5=&gt;[:useCutoff, false]}, :arg=&gt;{:vector_ie2=&gt;:index, :type=&gt;:index, :key=&gt;:vector_ie2, :slot=&gt;”maxclust”, :kind=&gt;:scalar_or_vector}}
+    if ((optidx = [remainingOptions indexOfObject:@”maxclust:”]) != NSNotFound) {
+        if (useCutoff_wasSet) NSCParameterAssert(false == resultsOut-&gt;useCutoff);
+        else { resultsOut-&gt;useCutoff = false; useCutoff_wasSet = true; }
+        resultsOut-&gt;maxclust = vMAT_coerce(optarg(), @[ @”index” ]);
+        [remainingOptions removeObjectsInRange:NSMakeRange(optidx, 2)];
+    }
+}
+```</p>
 
 <p>As you can see, in this case the DSL specification looks nothing at all like the generated <strong>Objective-C</strong> code.</p>
 
@@ -52,17 +174,70 @@
 
 <p>In a germinal version of <strong>vMAT</strong> (from even before embracing <strong>Objective-C++</strong>) I used the following idiom to implement the very first of the dispatch methods from the first example:</p>
 
-<p><div><script src='https://gist.github.com/5475264.js'></script>
-<noscript><pre><code></code></pre></noscript></div>
-</p>
+<p>```objc
+⋮</p>
+
+<ul>
+  <li>(void)_copy_miSINGLE_from_miDOUBLE:(vMAT_Array *)matrix;
+{
+#define TypeA float
+#define TypeB double
+  long lenA = vMAT_Size_prod(_size);
+  long lenB = vMAT_Size_prod(matrix.size);
+  NSParameterAssert(lenA == lenB);
+  TypeA * A = _data.mutableBytes;
+  const TypeB * B = matrix.data.bytes;
+  for (int i = 0;
+       i &lt; lenA;
+       i++) {
+      A[i] = B[i];
+  }
+#undef TypeA
+#undef TypeB
+}</li>
+</ul>
+
+<p>⋮
+```</p>
 
 <p>Clearly, this was disaster waiting to happen. Even with those <em>ugly</em> macros each copy &amp; paste instantiation of this “template” needed to be carefully edited in <em>four</em> places. Unsurprisingly, it was exactly this exercise that pushed me over the barrier and into the realm of <strong>Objective-C++</strong>. But how much did templates really improve things?</p>
 
 <p>Well, only by half, obviously. <strong>C++</strong> allowed me to create the overloaded <code>copyFrom</code> function that is still used in the generated code. But there was still no way to template-ize those <strong>Objective-C</strong> selectors. And that’s where the first incarnation of <strong>vMATCodeMonkey</strong> entered the scene.</p>
 
-<p><div><script src='https://gist.github.com/5475290.js'></script>
-<noscript><pre><code></code></pre></noscript></div>
-</p>
+<p>```ruby
+#  vMATCodeMonkey.rb
+#  vMAT
+#
+#  Created by Kaelin Colclasure on 4/23/13.
+#  Copyright (c) 2013 Kaelin Colclasure. All rights reserved.</p>
+
+<p>class VMATCodeMonkey</p>
+
+<p>MI_NUMERIC_TYPES = %w[
+    miINT8
+    miUINT8
+    miINT16
+    miUINT16
+    miINT32
+    miUINT32
+    miSINGLE
+    miDOUBLE
+    miINT64
+    miUINT64
+  ]</p>
+
+<p>MI_NUMERIC_TYPES.each {|to|
+      MI_NUMERIC_TYPES.each {|fm|
+          to_t = to[2, to.length - 2]
+          fm_t = fm[2, fm.length - 2]
+          print “- (void)<em>copy</em>#{to}<em>from</em>#{fm}:(vMAT_Array *)matrix;\n{\n”
+          print “    copyFrom(self, matrix, #{to_t}, #{fm_t});\n”
+          print “}\n\n”
+      }
+  }</p>
+
+<p>end
+```</p>
 
 <p>Not a DSL at all; just a quick <strong>ruby</strong> script to complete what would otherwise be an annoying and error-prone task.<sup id="fnref:hacks"><a href="#fn:hacks" rel="footnote">3</a></sup> But once you set foot down this path, it’s hard to stop.</p>
 

@@ -4,7 +4,7 @@
   <title><![CDATA[kaelin]]></title>
   <link href="http://kaelin.github.io/atom.xml" rel="self"/>
   <link href="http://kaelin.github.io/"/>
-  <updated>2013-05-04T19:22:08-07:00</updated>
+  <updated>2013-05-04T20:22:00-07:00</updated>
   <id>http://kaelin.github.io/</id>
   <author>
     <name><![CDATA[Kaelin Colclasure]]></name>
@@ -22,25 +22,269 @@
 
 <p>This is the problem that <strong>vMATCodeMonkey</strong> was designed to solve. <!-- more -->Given the following specification in the file <code>copyFromMethods.mk</code><sup id="fnref:exts"><a href="#fn:exts" rel="footnote">2</a></sup>:</p>
 
-<div><script src="https://gist.github.com/5474962.js"></script>
-<noscript><pre><code /></pre></noscript></div>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1">#  copyFromMethods.mk</span>
+</span><span class="line"><span class="c1">#  vMAT</span>
+</span><span class="line"><span class="c1">#</span>
+</span><span class="line"><span class="c1">#  Created by Kaelin Colclasure on 4/23/13.</span>
+</span><span class="line"><span class="c1">#  Copyright (c) 2013 Kaelin Colclasure. All rights reserved.</span>
+</span><span class="line">
+</span><span class="line"><span class="nb">require</span> <span class="s1">&#39;vMATCodeMonkey&#39;</span>
+</span><span class="line">
+</span><span class="line"><span class="no">VMATCodeMonkey</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">coercions</span> <span class="k">do</span> <span class="o">|</span><span class="n">to</span><span class="p">,</span> <span class="n">fm</span><span class="p">,</span> <span class="n">to_t</span><span class="p">,</span> <span class="n">fm_t</span><span class="o">|</span> <span class="o">&lt;&lt;</span><span class="sh">&quot;</span><span class="no">EOS</span><span class="sh">&quot;</span>
+</span><span class="line"><span class="sh">- (void)_copy_#{to}_from_#{fm}:(vMAT_Array *)matrix;</span>
+</span><span class="line"><span class="sh">{</span>
+</span><span class="line"><span class="sh">    copyFrom(self, matrix, #{to_t}, #{fm_t});</span>
+</span><span class="line"><span class="sh">}</span>
+</span><span class="line"><span class="no">EOS</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p><strong>vMATCodeMonkey</strong> produces 100 methods are all slight variations on this one:</p>
 
-<div><script src="https://gist.github.com/5474979.js"></script>
-<noscript><pre><code /></pre></noscript></div>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+</pre></td><td class="code"><pre><code class="objc"><span class="line"><span class="err">⋮</span>
+</span><span class="line">
+</span><span class="line"><span class="o">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nl">_copy_miDOUBLE_from_miSINGLE:</span><span class="p">(</span><span class="n">vMAT_Array</span> <span class="o">*</span><span class="p">)</span><span class="n">matrix</span><span class="p">;</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="n">copyFrom</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">DOUBLE</span><span class="p">,</span> <span class="n">SINGLE</span><span class="p">);</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="err">⋮</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>“That’s not very Impressive”, I hear you saying. Okay, let’s look at a more complex (but still highly repetitive) coding task: Parsing all those <code>vMAT_API</code> function’s <code>options</code> arrays.</p>
 
 <p>Given this specification from <code>clusterOptions.mk</code>:</p>
 
-<div><script src="https://gist.github.com/5475036.js"></script>
-<noscript><pre><code /></pre></noscript></div>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1">#  clusterOptions.mk</span>
+</span><span class="line"><span class="c1">#  vMAT</span>
+</span><span class="line"><span class="c1">#</span>
+</span><span class="line"><span class="c1">#  Created by Kaelin Colclasure on 4/26/13.</span>
+</span><span class="line"><span class="c1">#  Copyright (c) 2013 Kaelin Colclasure. All rights reserved.</span>
+</span><span class="line">
+</span><span class="line"><span class="nb">require</span> <span class="s1">&#39;vMATCodeMonkey&#39;</span>
+</span><span class="line">
+</span><span class="line"><span class="no">VMATCodeMonkey</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">options_processor</span> <span class="o">&lt;&lt;</span><span class="no">EOS</span><span class="p">,</span> <span class="ss">:static</span>
+</span><span class="line"><span class="sh">&quot;criterion:&quot;  arg: { choice =&gt; { &quot;distance&quot; =&gt; set(:useInconsistent, false), &quot;inconsistent&quot; =&gt; set(:useInconsistent, true) }}, default: &quot;inconsistent&quot;</span>
+</span><span class="line"><span class="sh">&quot;cutoff:&quot;     flag: set(:useCutoff, true), arg: vector(:double)</span>
+</span><span class="line"><span class="sh">&quot;depth:&quot;      flag: set(:useInconsistent, true), arg: scalar(:index), default: 2</span>
+</span><span class="line"><span class="sh">&quot;maxclust:&quot;   flag: set(:useCutoff, false), arg: vector(:index)</span>
+</span><span class="line"><span class="no">EOS</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p><strong>vMATCodeMonkey</strong> produces the following code:</p>
 
-<div><script src="https://gist.github.com/5475028.js"></script>
-<noscript><pre><code /></pre></noscript></div>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+<span class="line-number">53</span>
+<span class="line-number">54</span>
+<span class="line-number">55</span>
+<span class="line-number">56</span>
+<span class="line-number">57</span>
+<span class="line-number">58</span>
+<span class="line-number">59</span>
+<span class="line-number">60</span>
+<span class="line-number">61</span>
+<span class="line-number">62</span>
+<span class="line-number">63</span>
+<span class="line-number">64</span>
+<span class="line-number">65</span>
+<span class="line-number">66</span>
+<span class="line-number">67</span>
+<span class="line-number">68</span>
+<span class="line-number">69</span>
+<span class="line-number">70</span>
+<span class="line-number">71</span>
+<span class="line-number">72</span>
+<span class="line-number">73</span>
+<span class="line-number">74</span>
+<span class="line-number">75</span>
+<span class="line-number">76</span>
+<span class="line-number">77</span>
+<span class="line-number">78</span>
+<span class="line-number">79</span>
+<span class="line-number">80</span>
+<span class="line-number">81</span>
+<span class="line-number">82</span>
+<span class="line-number">83</span>
+<span class="line-number">84</span>
+<span class="line-number">85</span>
+<span class="line-number">86</span>
+<span class="line-number">87</span>
+</pre></td><td class="code"><pre><code class="objc"><span class="line"><span class="c1">// vMATCodeMonkey&#39;s work; do not edit by hand!</span>
+</span><span class="line">
+</span><span class="line"><span class="k">struct</span> <span class="n">clusterOptions</span> <span class="p">{</span>
+</span><span class="line">    <span class="n">NSMutableArray</span> <span class="o">*</span> <span class="n">remainingOptions</span><span class="p">;</span>
+</span><span class="line">    <span class="n">bool</span> <span class="n">useInconsistent</span><span class="p">;</span>
+</span><span class="line">    <span class="n">bool</span> <span class="n">useCutoff</span><span class="p">;</span>
+</span><span class="line">    <span class="n">NSString</span> <span class="o">*</span> <span class="n">criterion</span><span class="p">;</span>
+</span><span class="line">    <span class="n">vMAT_Array</span> <span class="o">*</span> <span class="n">cutoff</span><span class="p">;</span>
+</span><span class="line">    <span class="n">vMAT_Array</span> <span class="o">*</span> <span class="n">depth</span><span class="p">;</span>
+</span><span class="line">    <span class="n">vMAT_Array</span> <span class="o">*</span> <span class="n">maxclust</span><span class="p">;</span>
+</span><span class="line"><span class="p">};</span>
+</span><span class="line">
+</span><span class="line"><span class="cp">#define WITH_clusterOptions(options, opts) struct clusterOptions opts; clusterOptions(options, &amp;opts)</span>
+</span><span class="line">
+</span><span class="line"><span class="k">static</span> <span class="kt">void</span>
+</span><span class="line"><span class="nf">clusterOptions</span><span class="p">(</span><span class="n">NSArray</span> <span class="o">*</span> <span class="n">options</span><span class="p">,</span> <span class="k">struct</span> <span class="n">clusterOptions</span> <span class="o">*</span> <span class="n">resultsOut</span><span class="p">)</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="c1">// &quot;criterion:&quot;  arg: { choice =&gt; { &quot;distance&quot; =&gt; set(:useInconsistent, false), &quot;inconsistent&quot; =&gt; set(:useInconsistent, true) }}, default: &quot;inconsistent&quot;</span>
+</span><span class="line">    <span class="c1">// &quot;cutoff:&quot;     flag: set(:useCutoff, true), arg: vector(:double)</span>
+</span><span class="line">    <span class="c1">// &quot;depth:&quot;      flag: set(:useInconsistent, true), arg: scalar(:index), default: 2</span>
+</span><span class="line">    <span class="c1">// &quot;maxclust:&quot;   flag: set(:useCutoff, false), arg: vector(:index)</span>
+</span><span class="line">    <span class="c1">// Initialize resultsOut struct</span>
+</span><span class="line">    <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">remainingOptions</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+</span><span class="line">    <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">criterion</span> <span class="o">=</span> <span class="s">@&quot;inconsistent&quot;</span><span class="p">;</span>
+</span><span class="line">    <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">cutoff</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+</span><span class="line">    <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">depth</span> <span class="o">=</span> <span class="n">vMAT_coerce</span><span class="p">(</span><span class="err">@</span><span class="mi">2</span><span class="p">,</span> <span class="err">@</span><span class="p">[</span> <span class="s">@&quot;index&quot;</span> <span class="p">]);</span>
+</span><span class="line">    <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">maxclust</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+</span><span class="line">    <span class="c1">// Flags: [:useInconsistent, :useCutoff]</span>
+</span><span class="line">    <span class="n">bool</span> <span class="n">useInconsistent_wasSet</span> <span class="o">=</span> <span class="n">false</span><span class="p">;</span>
+</span><span class="line">    <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">useInconsistent</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
+</span><span class="line">    <span class="n">bool</span> <span class="n">useCutoff_wasSet</span> <span class="o">=</span> <span class="n">false</span><span class="p">;</span>
+</span><span class="line">    <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">useCutoff</span> <span class="o">=</span> <span class="n">false</span><span class="p">;</span>
+</span><span class="line">    <span class="c1">// Locals</span>
+</span><span class="line">    <span class="n">__block</span> <span class="n">NSMutableArray</span> <span class="o">*</span> <span class="n">remainingOptions</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+</span><span class="line">    <span class="n">__block</span> <span class="n">NSUInteger</span> <span class="n">optidx</span> <span class="o">=</span> <span class="n">NSNotFound</span><span class="p">;</span>
+</span><span class="line">    <span class="kt">id</span> <span class="p">(</span><span class="o">^</span> <span class="n">optarg</span><span class="p">)()</span> <span class="o">=</span> <span class="o">^</span> <span class="p">{</span> <span class="n">NSCParameterAssert</span><span class="p">([</span><span class="n">remainingOptions</span> <span class="n">count</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">optidx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span> <span class="k">return</span> <span class="n">remainingOptions</span><span class="p">[</span><span class="n">optidx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">];</span> <span class="p">};</span>
+</span><span class="line">    <span class="c1">// Options array normalization</span>
+</span><span class="line">    <span class="k">if</span> <span class="p">([</span><span class="n">options</span> <span class="n">count</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">        <span class="n">remainingOptions</span> <span class="o">=</span> <span class="p">[</span><span class="n">options</span> <span class="n">mutableCopy</span><span class="p">];</span>
+</span><span class="line">        <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">remainingOptions</span> <span class="o">=</span> <span class="n">remainingOptions</span><span class="p">;</span>
+</span><span class="line">        <span class="n">options</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line">    <span class="k">else</span> <span class="k">return</span><span class="p">;</span>
+</span><span class="line">    <span class="c1">// criterion: {:arg=&gt;{:choice_ie1=&gt;{&quot;distance&quot;=&gt;{:set_ie1=&gt;[:useInconsistent, false]}, &quot;inconsistent&quot;=&gt;{:set_ie2=&gt;[:useInconsistent, true]}}, :key=&gt;:choice_ie1, :slot=&gt;&quot;criterion&quot;, :kind=&gt;:choice_with_flags}, :default=&gt;&quot;inconsistent&quot;}</span>
+</span><span class="line">    <span class="k">if</span> <span class="p">((</span><span class="n">optidx</span> <span class="o">=</span> <span class="p">[</span><span class="n">remainingOptions</span> <span class="nl">indexOfObject:</span><span class="s">@&quot;criterion:&quot;</span><span class="p">])</span> <span class="o">!=</span> <span class="n">NSNotFound</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">        <span class="p">{</span>
+</span><span class="line">            <span class="n">NSMutableArray</span> <span class="o">*</span> <span class="n">remainingOptions</span> <span class="o">=</span> <span class="p">[</span><span class="err">@</span><span class="p">[</span> <span class="n">optarg</span><span class="p">(),</span> <span class="n">optarg</span><span class="p">()</span> <span class="p">]</span> <span class="n">mutableCopy</span><span class="p">];</span>
+</span><span class="line">            <span class="n">NSUInteger</span> <span class="n">optidx</span> <span class="o">=</span> <span class="n">NSNotFound</span><span class="p">;</span>
+</span><span class="line">            <span class="k">if</span> <span class="p">((</span><span class="n">optidx</span> <span class="o">=</span> <span class="p">[</span><span class="n">remainingOptions</span> <span class="nl">indexOfObject:</span><span class="s">@&quot;distance&quot;</span><span class="p">])</span> <span class="o">!=</span> <span class="n">NSNotFound</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">                <span class="k">if</span> <span class="p">(</span><span class="n">useInconsistent_wasSet</span><span class="p">)</span> <span class="n">NSCParameterAssert</span><span class="p">(</span><span class="n">false</span> <span class="o">==</span> <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">useInconsistent</span><span class="p">);</span>
+</span><span class="line">                <span class="k">else</span> <span class="p">{</span> <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">useInconsistent</span> <span class="o">=</span> <span class="n">false</span><span class="p">;</span> <span class="n">useInconsistent_wasSet</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span> <span class="p">}</span>
+</span><span class="line">                <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">criterion</span> <span class="o">=</span> <span class="p">[</span><span class="n">optarg</span><span class="p">()</span> <span class="n">description</span><span class="p">];</span>
+</span><span class="line">                <span class="p">[</span><span class="n">remainingOptions</span> <span class="nl">removeObjectsInRange:</span><span class="n">NSMakeRange</span><span class="p">(</span><span class="n">optidx</span><span class="p">,</span> <span class="mi">2</span><span class="p">)];</span>
+</span><span class="line">            <span class="p">}</span>
+</span><span class="line">            <span class="k">if</span> <span class="p">((</span><span class="n">optidx</span> <span class="o">=</span> <span class="p">[</span><span class="n">remainingOptions</span> <span class="nl">indexOfObject:</span><span class="s">@&quot;inconsistent&quot;</span><span class="p">])</span> <span class="o">!=</span> <span class="n">NSNotFound</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">                <span class="k">if</span> <span class="p">(</span><span class="n">useInconsistent_wasSet</span><span class="p">)</span> <span class="n">NSCParameterAssert</span><span class="p">(</span><span class="n">true</span> <span class="o">==</span> <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">useInconsistent</span><span class="p">);</span>
+</span><span class="line">                <span class="k">else</span> <span class="p">{</span> <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">useInconsistent</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span> <span class="n">useInconsistent_wasSet</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span> <span class="p">}</span>
+</span><span class="line">                <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">criterion</span> <span class="o">=</span> <span class="p">[</span><span class="n">optarg</span><span class="p">()</span> <span class="n">description</span><span class="p">];</span>
+</span><span class="line">                <span class="p">[</span><span class="n">remainingOptions</span> <span class="nl">removeObjectsInRange:</span><span class="n">NSMakeRange</span><span class="p">(</span><span class="n">optidx</span><span class="p">,</span> <span class="mi">2</span><span class="p">)];</span>
+</span><span class="line">            <span class="p">}</span>
+</span><span class="line">        <span class="p">}</span>
+</span><span class="line">        <span class="p">[</span><span class="n">remainingOptions</span> <span class="nl">removeObjectsInRange:</span><span class="n">NSMakeRange</span><span class="p">(</span><span class="n">optidx</span><span class="p">,</span> <span class="mi">2</span><span class="p">)];</span>
+</span><span class="line">        <span class="c1">// Default inconsistent</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line">    <span class="c1">// cutoff: {:flag=&gt;{:set_ie3=&gt;[:useCutoff, true]}, :arg=&gt;{:vector_ie1=&gt;:double, :type=&gt;:double, :key=&gt;:vector_ie1, :slot=&gt;&quot;cutoff&quot;, :kind=&gt;:scalar_or_vector}}</span>
+</span><span class="line">    <span class="k">if</span> <span class="p">((</span><span class="n">optidx</span> <span class="o">=</span> <span class="p">[</span><span class="n">remainingOptions</span> <span class="nl">indexOfObject:</span><span class="s">@&quot;cutoff:&quot;</span><span class="p">])</span> <span class="o">!=</span> <span class="n">NSNotFound</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">        <span class="k">if</span> <span class="p">(</span><span class="n">useCutoff_wasSet</span><span class="p">)</span> <span class="n">NSCParameterAssert</span><span class="p">(</span><span class="n">true</span> <span class="o">==</span> <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">useCutoff</span><span class="p">);</span>
+</span><span class="line">        <span class="k">else</span> <span class="p">{</span> <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">useCutoff</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span> <span class="n">useCutoff_wasSet</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span> <span class="p">}</span>
+</span><span class="line">        <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">cutoff</span> <span class="o">=</span> <span class="n">vMAT_coerce</span><span class="p">(</span><span class="n">optarg</span><span class="p">(),</span> <span class="err">@</span><span class="p">[</span> <span class="s">@&quot;double&quot;</span> <span class="p">]);</span>
+</span><span class="line">        <span class="p">[</span><span class="n">remainingOptions</span> <span class="nl">removeObjectsInRange:</span><span class="n">NSMakeRange</span><span class="p">(</span><span class="n">optidx</span><span class="p">,</span> <span class="mi">2</span><span class="p">)];</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line">    <span class="c1">// depth: {:flag=&gt;{:set_ie4=&gt;[:useInconsistent, true]}, :arg=&gt;{:scalar_ie1=&gt;:index, :type=&gt;:index, :key=&gt;:scalar_ie1, :slot=&gt;&quot;depth&quot;, :kind=&gt;:scalar_or_vector}, :default=&gt;2}</span>
+</span><span class="line">    <span class="k">if</span> <span class="p">((</span><span class="n">optidx</span> <span class="o">=</span> <span class="p">[</span><span class="n">remainingOptions</span> <span class="nl">indexOfObject:</span><span class="s">@&quot;depth:&quot;</span><span class="p">])</span> <span class="o">!=</span> <span class="n">NSNotFound</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">        <span class="k">if</span> <span class="p">(</span><span class="n">useInconsistent_wasSet</span><span class="p">)</span> <span class="n">NSCParameterAssert</span><span class="p">(</span><span class="n">true</span> <span class="o">==</span> <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">useInconsistent</span><span class="p">);</span>
+</span><span class="line">        <span class="k">else</span> <span class="p">{</span> <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">useInconsistent</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span> <span class="n">useInconsistent_wasSet</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span> <span class="p">}</span>
+</span><span class="line">        <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">depth</span> <span class="o">=</span> <span class="n">vMAT_coerce</span><span class="p">(</span><span class="n">optarg</span><span class="p">(),</span> <span class="err">@</span><span class="p">[</span> <span class="s">@&quot;index&quot;</span> <span class="p">]);</span>
+</span><span class="line">        <span class="p">[</span><span class="n">remainingOptions</span> <span class="nl">removeObjectsInRange:</span><span class="n">NSMakeRange</span><span class="p">(</span><span class="n">optidx</span><span class="p">,</span> <span class="mi">2</span><span class="p">)];</span>
+</span><span class="line">        <span class="c1">// Default 2</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line">    <span class="c1">// maxclust: {:flag=&gt;{:set_ie5=&gt;[:useCutoff, false]}, :arg=&gt;{:vector_ie2=&gt;:index, :type=&gt;:index, :key=&gt;:vector_ie2, :slot=&gt;&quot;maxclust&quot;, :kind=&gt;:scalar_or_vector}}</span>
+</span><span class="line">    <span class="k">if</span> <span class="p">((</span><span class="n">optidx</span> <span class="o">=</span> <span class="p">[</span><span class="n">remainingOptions</span> <span class="nl">indexOfObject:</span><span class="s">@&quot;maxclust:&quot;</span><span class="p">])</span> <span class="o">!=</span> <span class="n">NSNotFound</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">        <span class="k">if</span> <span class="p">(</span><span class="n">useCutoff_wasSet</span><span class="p">)</span> <span class="n">NSCParameterAssert</span><span class="p">(</span><span class="n">false</span> <span class="o">==</span> <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">useCutoff</span><span class="p">);</span>
+</span><span class="line">        <span class="k">else</span> <span class="p">{</span> <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">useCutoff</span> <span class="o">=</span> <span class="n">false</span><span class="p">;</span> <span class="n">useCutoff_wasSet</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span> <span class="p">}</span>
+</span><span class="line">        <span class="n">resultsOut</span><span class="o">-&gt;</span><span class="n">maxclust</span> <span class="o">=</span> <span class="n">vMAT_coerce</span><span class="p">(</span><span class="n">optarg</span><span class="p">(),</span> <span class="err">@</span><span class="p">[</span> <span class="s">@&quot;index&quot;</span> <span class="p">]);</span>
+</span><span class="line">        <span class="p">[</span><span class="n">remainingOptions</span> <span class="nl">removeObjectsInRange:</span><span class="n">NSMakeRange</span><span class="p">(</span><span class="n">optidx</span><span class="p">,</span> <span class="mi">2</span><span class="p">)];</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>As you can see, in this case the DSL specification looks nothing at all like the generated <strong>Objective-C</strong> code.</p>
 
@@ -48,15 +292,119 @@
 
 <p>In a germinal version of <strong>vMAT</strong> (from even before embracing <strong>Objective-C++</strong>) I used the following idiom to implement the very first of the dispatch methods from the first example:</p>
 
-<div><script src="https://gist.github.com/5475264.js"></script>
-<noscript><pre><code /></pre></noscript></div>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+</pre></td><td class="code"><pre><code class="objc"><span class="line"><span class="err">⋮</span>
+</span><span class="line">
+</span><span class="line"><span class="o">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nl">_copy_miSINGLE_from_miDOUBLE:</span><span class="p">(</span><span class="n">vMAT_Array</span> <span class="o">*</span><span class="p">)</span><span class="n">matrix</span><span class="p">;</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line"><span class="cp">#define TypeA float</span>
+</span><span class="line"><span class="cp">#define TypeB double</span>
+</span><span class="line">    <span class="kt">long</span> <span class="n">lenA</span> <span class="o">=</span> <span class="n">vMAT_Size_prod</span><span class="p">(</span><span class="n">_size</span><span class="p">);</span>
+</span><span class="line">    <span class="kt">long</span> <span class="n">lenB</span> <span class="o">=</span> <span class="n">vMAT_Size_prod</span><span class="p">(</span><span class="n">matrix</span><span class="p">.</span><span class="n">size</span><span class="p">);</span>
+</span><span class="line">    <span class="n">NSParameterAssert</span><span class="p">(</span><span class="n">lenA</span> <span class="o">==</span> <span class="n">lenB</span><span class="p">);</span>
+</span><span class="line">    <span class="n">TypeA</span> <span class="o">*</span> <span class="n">A</span> <span class="o">=</span> <span class="n">_data</span><span class="p">.</span><span class="n">mutableBytes</span><span class="p">;</span>
+</span><span class="line">    <span class="k">const</span> <span class="n">TypeB</span> <span class="o">*</span> <span class="n">B</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">bytes</span><span class="p">;</span>
+</span><span class="line">    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class="line">         <span class="n">i</span> <span class="o">&lt;</span> <span class="n">lenA</span><span class="p">;</span>
+</span><span class="line">         <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">        <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">B</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line"><span class="cp">#undef TypeA</span>
+</span><span class="line"><span class="cp">#undef TypeB</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="err">⋮</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Clearly, this was disaster waiting to happen. Even with those <em>ugly</em> macros each copy &amp; paste instantiation of this “template” needed to be carefully edited in <em>four</em> places. Unsurprisingly, it was exactly this exercise that pushed me over the barrier and into the realm of <strong>Objective-C++</strong>. But how much did templates really improve things?</p>
 
 <p>Well, only by half, obviously. <strong>C++</strong> allowed me to create the overloaded <code>copyFrom</code> function that is still used in the generated code. But there was still no way to template-ize those <strong>Objective-C</strong> selectors. And that’s where the first incarnation of <strong>vMATCodeMonkey</strong> entered the scene.</p>
 
-<div><script src="https://gist.github.com/5475290.js"></script>
-<noscript><pre><code /></pre></noscript></div>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1">#  vMATCodeMonkey.rb</span>
+</span><span class="line"><span class="c1">#  vMAT</span>
+</span><span class="line"><span class="c1">#</span>
+</span><span class="line"><span class="c1">#  Created by Kaelin Colclasure on 4/23/13.</span>
+</span><span class="line"><span class="c1">#  Copyright (c) 2013 Kaelin Colclasure. All rights reserved.</span>
+</span><span class="line">
+</span><span class="line"><span class="k">class</span> <span class="nc">VMATCodeMonkey</span>
+</span><span class="line">
+</span><span class="line">  <span class="no">MI_NUMERIC_TYPES</span> <span class="o">=</span> <span class="sx">%w[</span>
+</span><span class="line"><span class="sx">    miINT8</span>
+</span><span class="line"><span class="sx">    miUINT8</span>
+</span><span class="line"><span class="sx">    miINT16</span>
+</span><span class="line"><span class="sx">    miUINT16</span>
+</span><span class="line"><span class="sx">    miINT32</span>
+</span><span class="line"><span class="sx">    miUINT32</span>
+</span><span class="line"><span class="sx">    miSINGLE</span>
+</span><span class="line"><span class="sx">    miDOUBLE</span>
+</span><span class="line"><span class="sx">    miINT64</span>
+</span><span class="line"><span class="sx">    miUINT64</span>
+</span><span class="line"><span class="sx">  ]</span>
+</span><span class="line">
+</span><span class="line">  <span class="no">MI_NUMERIC_TYPES</span><span class="o">.</span><span class="n">each</span> <span class="p">{</span><span class="o">|</span><span class="n">to</span><span class="o">|</span>
+</span><span class="line">      <span class="no">MI_NUMERIC_TYPES</span><span class="o">.</span><span class="n">each</span> <span class="p">{</span><span class="o">|</span><span class="n">fm</span><span class="o">|</span>
+</span><span class="line">          <span class="n">to_t</span> <span class="o">=</span> <span class="n">to</span><span class="o">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">to</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="mi">2</span><span class="o">]</span>
+</span><span class="line">          <span class="n">fm_t</span> <span class="o">=</span> <span class="n">fm</span><span class="o">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">fm</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="mi">2</span><span class="o">]</span>
+</span><span class="line">          <span class="nb">print</span> <span class="s2">&quot;- (void)_copy_</span><span class="si">#{</span><span class="n">to</span><span class="si">}</span><span class="s2">_from_</span><span class="si">#{</span><span class="n">fm</span><span class="si">}</span><span class="s2">:(vMAT_Array *)matrix;</span><span class="se">\n</span><span class="s2">{</span><span class="se">\n</span><span class="s2">&quot;</span>
+</span><span class="line">          <span class="nb">print</span> <span class="s2">&quot;    copyFrom(self, matrix, </span><span class="si">#{</span><span class="n">to_t</span><span class="si">}</span><span class="s2">, </span><span class="si">#{</span><span class="n">fm_t</span><span class="si">}</span><span class="s2">);</span><span class="se">\n</span><span class="s2">&quot;</span>
+</span><span class="line">          <span class="nb">print</span> <span class="s2">&quot;}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+</span><span class="line">      <span class="p">}</span>
+</span><span class="line">  <span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Not a DSL at all; just a quick <strong>ruby</strong> script to complete what would otherwise be an annoying and error-prone task.<sup id="fnref:hacks"><a href="#fn:hacks" rel="footnote">3</a></sup> But once you set foot down this path, it’s hard to stop.</p>
 
